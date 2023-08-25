@@ -18,6 +18,9 @@ fragment LETRA : [a-zA-Z] ;
 fragment DIGITO : [0-9] ;
 PA : '(';
 PC : ')';
+LLAVE_APERTURA:'{';
+LLAVE_CIERRE:'}';
+
 TIPO_INT : 'int';
 TIPO_FLOAT : 'float';
 TIPO_DOUBLE : 'double';
@@ -25,8 +28,65 @@ IGUAL :'=';
 FIN_DE_SENTENCIA :';';
 ID_NOMBRE_VARIABLE : (LETRA|'_') (LETRA|DIGITO|'_') *;
 COMA:',';
+MENOR:'<';
+MAYOR:'>';
+SA:'!';
 
 NUMERO : DIGITO+;
+
+//operadores
+MAS:'+';
+MENOS:'-';
+MULTIPLICACION:'*';
+DIVISION:'/';
+MODULO:'%';
+
+operadores:MAS
+          |MENOS
+          |MULTIPLICACION
+          |DIVISION
+          |MODULO
+          ;
+
+operacion: ID_NOMBRE_VARIABLE operacion_ld
+         | NUMERO operacion_ld
+         ;
+
+//ld es lado derecho
+operacion_ld: (operadores ID_NOMBRE_VARIABLE) operacion_ld*
+            | (operadores NUMERO) operacion_ld*
+            ;
+
+//comparadores
+CMP_IGUAL:IGUAL IGUAL;
+CMP_DISTINTO:SA IGUAL;
+CMP_MENOR:MENOR;
+CMP_MAYOR:MAYOR;
+CMP_MENOR_IGUAL:MENOR IGUAL;
+CMP_MAYOR_IGUAL:MAYOR IGUAL;
+
+comparadores:CMP_IGUAL
+            |CMP_DISTINTO
+            |MENOR
+            |MAYOR
+            |CMP_MENOR_IGUAL
+            |CMP_MAYOR_IGUAL
+            ;
+
+
+
+comparacion_sin_parentesis: NUMERO comparadores NUMERO
+           | ID_NOMBRE_VARIABLE comparadores NUMERO
+           | ID_NOMBRE_VARIABLE comparadores ID_NOMBRE_VARIABLE
+           | NUMERO comparadores ID_NOMBRE_VARIABLE
+           ;
+comparacion: PA comparacion_sin_parentesis PC;
+
+//ciclos y condicionales
+//la C es de custom
+c_while:'while';
+c_for:'for';
+c_if:'if';
 
 WS : [ \n\t\r] -> skip ;//descarta todo lo espaciado por ende no le va a interesar si el ; el = etc.. estan a continuacion o con espacio entre los unos y los otros
 
@@ -39,25 +99,34 @@ tipo_variable : TIPO_INT
               | TIPO_FLOAT 
               | TIPO_DOUBLE ;//yo genero el token con el tipo de variable
 
+//lado derecho de la
 asignacion : IGUAL NUMERO asignacion // la recursividad la vas a repetir para caso en el cual sepas que se puede repetir
            | IGUAL ID_NOMBRE_VARIABLE asignacion
            | COMA ID_NOMBRE_VARIABLE asignacion
+           | IGUAL operacion
            |;
 
-
-//((LETRA|DIGITO|'_') *) esto quiere decir que puede tener o no una letra o digito o _ a continuacion de la letra o _ primera... 
-
 decalracion_y_asigancion_de_variable : declaracion_de_variable asignacion
-                                     | declaracion_de_variable asignacion
                                      | ID_NOMBRE_VARIABLE asignacion
-                                     | ID_NOMBRE_VARIABLE asignacion;
+                                     ;
 
 instrucciones : instruccion instrucciones
   |
   ;
 
+instrucciones_del_for: instruccion instruccion ID_NOMBRE_VARIABLE asignacion
+                   ;
+
 instruccion: declaracion_de_variable FIN_DE_SENTENCIA
-            ;
+           | decalracion_y_asigancion_de_variable FIN_DE_SENTENCIA
+           | LLAVE_APERTURA instrucciones LLAVE_CIERRE
+           | PA instrucciones PC
+           | c_while comparacion
+           | c_if comparacion
+           | c_for PA instrucciones_del_for PC
+           | comparacion_sin_parentesis FIN_DE_SENTENCIA
+           | operacion FIN_DE_SENTENCIA
+           ;
 
 
 

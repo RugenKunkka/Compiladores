@@ -3,3 +3,28 @@ int y_2 = 43;
 int xyz = x;
 int a,b,c=3;
 int d,e=f,g;
+f=2;
+
+while(x<3){
+    int x=5;
+}
+
+while(x<3)
+    int x=5;
+
+if(x==5){
+    int x=6;
+}
+
+if(x!=5)
+    int x=6;
+
+f<=r;
+
+f+2+x;
+int j = j+1;
+
+
+for (int f=0;f<=r;f=f+1){
+    int j=6+j;
+}
