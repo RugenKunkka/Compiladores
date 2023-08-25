@@ -1,1 +1,5 @@
-(())()
+int x;
+int y_2 = 43;
+int xyz = x;
+int a,b,c=3;
+int d,e=f,g;
