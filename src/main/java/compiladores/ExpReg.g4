@@ -113,7 +113,7 @@ c_if:'if';
 
 WS : [ \n\t\r] -> skip ;//descarta todo lo espaciado por ende no le va a interesar si el ; el = etc.. estan a continuacion o con espacio entre los unos y los otros
 
-programa : instrucciones EOF;
+programa : instrucciones <EOF>;
 //PA s PC s
 
 tipo_variable : TIPO_INT 

@@ -4,6 +4,7 @@ package compiladores;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 // Las diferentes entradas se explicaran oportunamente
 public class App {
@@ -22,15 +23,16 @@ public class App {
         ExpRegParser parser = new ExpRegParser(tokens);
                 
         // create Listener
-        // ExpRegBaseListener escucha = new Escucha();
+         ExpRegBaseListener escucha = new Escucha();
 
         // Conecto el objeto con Listeners al parser
-        // parser.addParseListener(escucha);
+        parser.addParseListener(escucha);
 
         // Solicito al parser que comience indicando una regla gramatical
         // En este caso la regla es el simbolo inicial
-        parser.programa();
-        // ParseTree tree =  parser.s();
+        ParseTree tree =  parser.programa();
+        System.out.println(tree.toStringTree(parser));
+        
         // Conectamos el visitor
         // Caminante visitor = new Caminante();
         // visitor.visit(tree);
