@@ -82,6 +82,28 @@ comparacion_sin_parentesis: NUMERO comparadores NUMERO
            ;
 comparacion: PA comparacion_sin_parentesis PC;
 
+
+/*reglas alfred aho para operaciones y le da prioridad a las multiplicaciones
+deja las sumas para el ultimo por lo tanto come mas memoria xq siempre va a resolver
+primero la multiplicacion por ej x=xs+2*5-4
+va a leer hasta xs pero dsps va a resolver la multiplicacion y recien ahi va a parar a la suma y a la resta
+*/
+expresion: expresion MAS termino
+         | expresion MENOS termino
+         | termino
+         ;
+
+termino: termino MULTIPLICACION factor
+       | termino DIVISION factor
+       | termino MODULO factor
+       | factor
+       ;
+
+factor: PA expresion PC
+      | ID_NOMBRE_VARIABLE
+      | NUMERO
+      ;
+
 //ciclos y condicionales
 //la C es de custom
 c_while:'while';
@@ -93,32 +115,34 @@ WS : [ \n\t\r] -> skip ;//descarta todo lo espaciado por ende no le va a interes
 programa : instrucciones EOF;
 //PA s PC s
 
-declaracion_de_variable : tipo_variable ID_NOMBRE_VARIABLE asignacion  ;
-
 tipo_variable : TIPO_INT 
               | TIPO_FLOAT 
               | TIPO_DOUBLE ;//yo genero el token con el tipo de variable
 
+asignacion: ID_NOMBRE_VARIABLE IGUAL expresion
+          ;
+
 //lado derecho de la
-asignacion : IGUAL NUMERO asignacion // la recursividad la vas a repetir para caso en el cual sepas que se puede repetir
-           | IGUAL ID_NOMBRE_VARIABLE asignacion
-           | COMA ID_NOMBRE_VARIABLE asignacion
+asignacion_ld: //IGUAL NUMERO asignacion_ld // la recursividad la vas a repetir para caso en el cual sepas que se puede repetir
+           //| IGUAL ID_NOMBRE_VARIABLE asignacion_ld
+             IGUAL expresion asignacion_ld
+           | COMA ID_NOMBRE_VARIABLE asignacion_ld
            | IGUAL operacion
            |;
 
-decalracion_y_asigancion_de_variable : declaracion_de_variable asignacion
-                                     | ID_NOMBRE_VARIABLE asignacion
+decalracion_y_asigancion_de_variable : tipo_variable ID_NOMBRE_VARIABLE asignacion_ld
+                                     //| ID_NOMBRE_VARIABLE asignacion_ld
                                      ;
 
 instrucciones : instruccion instrucciones
   |
   ;
 
-instrucciones_del_for: instruccion instruccion ID_NOMBRE_VARIABLE asignacion
+instrucciones_del_for: instruccion instruccion ID_NOMBRE_VARIABLE asignacion_ld
                    ;
 
-instruccion: declaracion_de_variable FIN_DE_SENTENCIA
-           | decalracion_y_asigancion_de_variable FIN_DE_SENTENCIA
+instruccion: decalracion_y_asigancion_de_variable FIN_DE_SENTENCIA
+           | asignacion FIN_DE_SENTENCIA
            | LLAVE_APERTURA instrucciones LLAVE_CIERRE
            | PA instrucciones PC
            | c_while comparacion

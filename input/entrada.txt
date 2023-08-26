@@ -28,3 +28,5 @@ int j = j+1;
 for (int f=0;f<=r;f=f+1){
     int j=6+j;
 }
+
+x= xs +5 * 4 -2;
