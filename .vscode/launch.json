@@ -9,7 +9,7 @@
             "type": "antlr-debug",
             "request": "launch",
             // Archivo con la gramatica
-            "grammar": "src/main/java/compiladores/id.g4",
+            "grammar": "src/main/java/compiladores/ExpReg.g4",
             // Archivo a parsear
             "input": "input/entrada.txt",
             // Simbolo inicial

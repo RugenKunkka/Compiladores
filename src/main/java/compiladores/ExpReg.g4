@@ -1,4 +1,4 @@
-grammar id;
+grammar ExpReg;
 
 @header {
 package compiladores;
@@ -48,13 +48,14 @@ operadores:MAS
           |MODULO
           ;
 
-operacion: ID_NOMBRE_VARIABLE operacion_ld
-         | NUMERO operacion_ld
+operacion: expresion operacion_ld //ID_NOMBRE_VARIABLE operacion_ld
+         //| NUMERO operacion_ld
          ;
 
 //ld es lado derecho
-operacion_ld: (operadores ID_NOMBRE_VARIABLE) operacion_ld*
-            | (operadores NUMERO) operacion_ld*
+operacion_ld: //(operadores ID_NOMBRE_VARIABLE) operacion_ld*
+            //| (operadores NUMERO) operacion_ld*
+            (operadores expresion) operacion_ld*
             ;
 
 //comparadores
