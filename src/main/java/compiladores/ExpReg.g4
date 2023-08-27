@@ -131,9 +131,12 @@ asignacion_ld: //IGUAL NUMERO asignacion_ld // la recursividad la vas a repetir 
            | IGUAL operacion
            |;
 
-decalracion_y_asigancion_de_variable : tipo_variable ID_NOMBRE_VARIABLE asignacion_ld
+declaracion_y_asigancion_de_variable : tipo_variable ID_NOMBRE_VARIABLE asignacion_ld
                                      //| ID_NOMBRE_VARIABLE asignacion_ld
                                      ;
+
+declaracion_multiple: tipo_variable ID_NOMBRE_VARIABLE (COMA ID_NOMBRE_VARIABLE)*
+                    ;
 
 instrucciones : instruccion instrucciones
   |
@@ -142,7 +145,7 @@ instrucciones : instruccion instrucciones
 instrucciones_del_for: instruccion instruccion ID_NOMBRE_VARIABLE asignacion_ld
                    ;
 
-instruccion: decalracion_y_asigancion_de_variable FIN_DE_SENTENCIA
+instruccion: declaracion_y_asigancion_de_variable FIN_DE_SENTENCIA
            | asignacion FIN_DE_SENTENCIA
            | LLAVE_APERTURA instrucciones LLAVE_CIERRE
            | PA instrucciones PC
