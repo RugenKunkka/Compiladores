@@ -28,11 +28,14 @@ public class App {
         ExpRegBaseListener escucha = new Escucha();
 
         // Conecto el objeto con Listeners al parser
-        parser.addParseListener(escucha);
+        //stefanoo descomentar!!
+        //parser.addParseListener(escucha);
 
         // Solicito al parser que comience indicando una regla gramatical
         // En este caso la regla es el simbolo inicial
         ParseTree tree =  parser.programa();
+
+
         //System.out.println(tree.toStringTree(parser));
         
         // Conectamos el visitor

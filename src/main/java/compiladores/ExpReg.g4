@@ -32,6 +32,9 @@ MENOR:'<';
 MAYOR:'>';
 SA:'!';
 
+CA:'[';
+CC:']';
+
 NUMERO : DIGITO+;
 
 //operadores
@@ -58,7 +61,7 @@ operacion_ld: //(operadores ID_NOMBRE_VARIABLE) operacion_ld*
             (operadores expresion) operacion_ld*
             ;
 
-//comparadores
+//inicio comparadores y comparaciones
 CMP_IGUAL:IGUAL IGUAL;
 CMP_DISTINTO:SA IGUAL;
 CMP_MENOR:MENOR;
@@ -77,11 +80,13 @@ comparadores:CMP_IGUAL
 
 
 comparacion_sin_parentesis: NUMERO comparadores NUMERO
-           | ID_NOMBRE_VARIABLE comparadores NUMERO
-           | ID_NOMBRE_VARIABLE comparadores ID_NOMBRE_VARIABLE
-           | NUMERO comparadores ID_NOMBRE_VARIABLE
-           ;
+                          | NUMERO comparadores ID_NOMBRE_VARIABLE
+                          | ID_NOMBRE_VARIABLE comparadores ID_NOMBRE_VARIABLE
+                          | ID_NOMBRE_VARIABLE comparadores NUMERO
+                          ;
 comparacion: PA comparacion_sin_parentesis PC;
+
+//fin comparadores y comparaciones
 
 
 /*reglas alfred aho para operaciones y le da prioridad a las multiplicaciones
@@ -110,6 +115,10 @@ factor: PA expresion PC
 c_while:'while';
 c_for:'for';
 c_if:'if';
+c_elseif:'else if';
+c_else:'else';
+
+c_return:'return';
 
 WS : [ \n\t\r] -> skip ;//descarta todo lo espaciado por ende no le va a interesar si el ; el = etc.. estan a continuacion o con espacio entre los unos y los otros
 
@@ -138,6 +147,51 @@ declaracion_y_asigancion_de_variable : tipo_variable ID_NOMBRE_VARIABLE asignaci
 declaracion_multiple: tipo_variable ID_NOMBRE_VARIABLE (COMA ID_NOMBRE_VARIABLE)*
                     ;
 
+//inicio matriz
+instruccion_matriz: declaracion_matriz
+                  | asignacion_matriz
+                  | declaracion_y_asignacion_matriz
+                  | declaracion_matriz_ld
+                  ;
+instruccion_matriz_forma_generica:tipo_variable? declaracion_matriz_ld (IGUAL expresion)?
+                                 ;
+
+declaracion_y_asignacion_matriz: tipo_variable asignacion_matriz
+                                ;
+
+asignacion_matriz: declaracion_matriz_ld IGUAL expresion
+                  ;
+declaracion_matriz: tipo_variable declaracion_matriz_ld
+                  ;
+declaracion_matriz_ld: ID_NOMBRE_VARIABLE (CA expresion CC) (CA expresion CC)?
+                      ;     
+//fin matriz
+
+//inicio funciones
+parametros_declaracion: variable_o_parametro_aislada COMA parametros_declaracion
+                      | variable_o_parametro_aislada
+                      |
+                      ;
+
+parametros_para_llamada: expresion COMA parametros_para_llamada
+                       | expresion
+                       |
+                       ;
+
+variable_o_parametro_aislada:tipo_variable ID_NOMBRE_VARIABLE
+                            ;
+
+declaracion_funcion: tipo_variable ID_NOMBRE_VARIABLE PA parametros_declaracion PC
+                   ;
+llamada_funcion: ID_NOMBRE_VARIABLE PA parametros_para_llamada PC
+              ;
+
+retorno_funcion: c_return
+               | c_return expresion
+               ; 
+//fin funciones
+
+
 instrucciones : instruccion instrucciones
   |
   ;
@@ -145,15 +199,28 @@ instrucciones : instruccion instrucciones
 instrucciones_del_for: instruccion instruccion ID_NOMBRE_VARIABLE asignacion_ld
                    ;
 
-instruccion: declaracion_y_asigancion_de_variable FIN_DE_SENTENCIA
+COMENTARIO : '//' ~[\r\n]* -> skip;
+//incio funciones
+instruccion: declaracion_funcion FIN_DE_SENTENCIA
+           | declaracion_funcion LLAVE_APERTURA instrucciones LLAVE_CIERRE
+           | retorno_funcion FIN_DE_SENTENCIA
+           | llamada_funcion FIN_DE_SENTENCIA
+           | COMENTARIO
+           //fin de funciones
+           | declaracion_y_asigancion_de_variable FIN_DE_SENTENCIA
            | asignacion FIN_DE_SENTENCIA
            | LLAVE_APERTURA instrucciones LLAVE_CIERRE
            | PA instrucciones PC
            | c_while comparacion
+           //ifs else ifs else inicio
            | c_if comparacion
+           | c_elseif comparacion
+           | c_else
+           //fin ifs else ifs else inicio
            | c_for PA instrucciones_del_for PC
            | comparacion_sin_parentesis FIN_DE_SENTENCIA
            | operacion FIN_DE_SENTENCIA
+           | instruccion_matriz FIN_DE_SENTENCIA
            ;
 
 
