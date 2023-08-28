@@ -12,6 +12,7 @@ import compiladores.ExpRegBaseListener;
 import compiladores.ExpRegParser.Asignacion_ldContext;
 import compiladores.ExpRegParser.Bloque_instruccionesContext;
 import compiladores.ExpRegParser.Declaracion_funcionContext;
+import compiladores.ExpRegParser.Declaracion_matrizContext;
 import compiladores.ExpRegParser.Declaracion_y_asigancion_de_variableContext;
 //import compiladores.ExpRegParser;
 import compiladores.ExpRegParser.InstruccionContext;
@@ -29,6 +30,13 @@ public class Escucha extends ExpRegBaseListener{
     public Escucha() {
         this.tablaSimbolos = TablaSimbolos.getInstance(); // Obtener la instancia única
         this.identificadoresTemp=new ArrayList<Identificador>();
+    }
+
+    @Override
+    public void exitDeclaracion_matriz(Declaracion_matrizContext ctx) {
+        Variable tempVariable = new Variable(ctx.declaracion_matriz_ld().ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
+        this.tablaSimbolos.agregarId(tempVariable);
+
     }
 
     @Override
@@ -87,6 +95,9 @@ public class Escucha extends ExpRegBaseListener{
         }
         
     }
+
+    
+
     @Override
     public void exitVariable_o_parametro_aislada(Variable_o_parametro_aisladaContext ctx) {
         Variable variableAislada= new Variable(ctx.ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
@@ -120,7 +131,10 @@ public class Escucha extends ExpRegBaseListener{
         //super.exitPrograma(ctx);
         System.out.println("TERMINO EL PROGRAMAAA???!!!");
         this.tablaSimbolos.toPrint();
+        this.tablaSimbolos.saveTablaSimbolos();
     }
+
+    
 
     @Override
     public void visitTerminal(TerminalNode node) {

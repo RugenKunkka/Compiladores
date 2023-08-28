@@ -1,3 +1,6 @@
+int matriz[2][4];
+int matriz[2][4];
+int nose1;
 int globalX;
 int globalParaVerSiConfundeCtx;
 int j;
@@ -62,5 +65,7 @@ int main (){
         y=3;
         y=j+5*8%9;
     }
-
+    int variableFinalContext1;
 }
+
+int variableFinalContext_2;

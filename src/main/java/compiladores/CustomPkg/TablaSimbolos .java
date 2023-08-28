@@ -1,5 +1,9 @@
 package compiladores.CustomPkg;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +76,19 @@ class TablaSimbolos  {
     public void toPrint(){
         for(NodoContext nodoContext :this.historialContext){
             nodoContext.toPrint();
+        }
+    }
+
+    public void saveTablaSimbolos() {
+        String filePath = "TablaSimbolos.txt"; // Ruta relativa dentro del proyecto
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))) {
+            for (NodoContext nodoContext : this.historialContext) {
+                String content = nodoContext.toString();
+                writer.println(content);
+            }
+            System.out.println("Contenido guardado en " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error al guardar el contenido en el archivo: " + e.getMessage());
         }
     }
     
