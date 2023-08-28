@@ -1,11 +1,11 @@
 int globalX;
 int globalParaVerSiConfundeCtx;
-
-int suma(int x, int y);
+int j;
 
 int suma(int x, int y){
     int c;
     c=x+y;
+    suma(2,3);
 
     return c;
 }
@@ -24,7 +24,7 @@ int funcionUsaGlobal(){
 
 int main (){
     int globalParaVerSiConfundeCtx;
-
+    getMatriz()[2][3];
     int matriz[2][3];
     int matriz[2][3]=2;
     matriz[2][3]=5;
@@ -38,14 +38,29 @@ int main (){
     suma(x , 4);
     suma(3 , 4);
     suma(3+3*4 , 4*x);
-
+    
     if(2>3){
-
+        int h=3;
     } else if( 3<2){
-
+        float k =2;
     } else {
 
     }
-    
+    x;
+    2;
+    MATRIZ[1][2*4+5+(3/4)];
+    //MATRIZ[1][suma(3,5)];
+    while(x<3){
+        int x=5;
+    }
+    while(x<(3-5*2)){
+        int x=5;
+    }
+
+    while(x<=(3-5*2)){
+        int x=5;
+        y=3;
+        y=j+5*8%9;
+    }
 
 }

@@ -26,7 +26,7 @@ TIPO_FLOAT : 'float';
 TIPO_DOUBLE : 'double';
 IGUAL :'=';
 FIN_DE_SENTENCIA :';';
-ID_NOMBRE_VARIABLE : (LETRA|'_') (LETRA|DIGITO|'_') *;
+ID_NOMBRE_VAR_FUNC : (LETRA|'_') (LETRA|DIGITO|'_') *;
 COMA:',';
 MENOR:'<';
 MAYOR:'>';
@@ -51,12 +51,12 @@ operadores:MAS
           |MODULO
           ;
 
-operacion: expresion operacion_ld //ID_NOMBRE_VARIABLE operacion_ld
+operacion: expresion operacion_ld //ID_NOMBRE_VAR_FUNC operacion_ld
          //| NUMERO operacion_ld
          ;
 
 //ld es lado derecho
-operacion_ld: //(operadores ID_NOMBRE_VARIABLE) operacion_ld*
+operacion_ld: //(operadores ID_NOMBRE_VAR_FUNC) operacion_ld*
             //| (operadores NUMERO) operacion_ld*
             (operadores expresion) operacion_ld*
             ;
@@ -79,10 +79,11 @@ comparadores:CMP_IGUAL
 
 
 
-comparacion_sin_parentesis: NUMERO comparadores NUMERO
-                          | NUMERO comparadores ID_NOMBRE_VARIABLE
-                          | ID_NOMBRE_VARIABLE comparadores ID_NOMBRE_VARIABLE
-                          | ID_NOMBRE_VARIABLE comparadores NUMERO
+comparacion_sin_parentesis: //NUMERO comparadores NUMERO
+                          //| NUMERO comparadores ID_NOMBRE_VAR_FUNC
+                          //| ID_NOMBRE_VAR_FUNC comparadores ID_NOMBRE_VAR_FUNC
+                          //| ID_NOMBRE_VAR_FUNC comparadores NUMERO
+                          expresion comparadores expresion
                           ;
 comparacion: PA comparacion_sin_parentesis PC;
 
@@ -106,8 +107,9 @@ termino: termino MULTIPLICACION factor
        ;
 
 factor: PA expresion PC
-      | ID_NOMBRE_VARIABLE
+      | ID_NOMBRE_VAR_FUNC
       | NUMERO
+      | declaracion_matriz_ld
       ;
 
 //ciclos y condicionales
@@ -129,22 +131,22 @@ tipo_variable : TIPO_INT
               | TIPO_FLOAT 
               | TIPO_DOUBLE ;//yo genero el token con el tipo de variable
 
-asignacion: ID_NOMBRE_VARIABLE IGUAL expresion
+asignacion: ID_NOMBRE_VAR_FUNC IGUAL expresion
           ;
 
 //lado derecho de la
 asignacion_ld: //IGUAL NUMERO asignacion_ld // la recursividad la vas a repetir para caso en el cual sepas que se puede repetir
-           //| IGUAL ID_NOMBRE_VARIABLE asignacion_ld
+           //| IGUAL ID_NOMBRE_VAR_FUNC asignacion_ld
              IGUAL expresion asignacion_ld
-           | COMA ID_NOMBRE_VARIABLE asignacion_ld
+           | COMA ID_NOMBRE_VAR_FUNC asignacion_ld
            | IGUAL operacion
            |;
 
-declaracion_y_asigancion_de_variable : tipo_variable ID_NOMBRE_VARIABLE asignacion_ld
-                                     //| ID_NOMBRE_VARIABLE asignacion_ld
+declaracion_y_asigancion_de_variable : tipo_variable ID_NOMBRE_VAR_FUNC asignacion_ld
+                                     //| ID_NOMBRE_VAR_FUNC asignacion_ld
                                      ;
 
-declaracion_multiple: tipo_variable ID_NOMBRE_VARIABLE (COMA ID_NOMBRE_VARIABLE)*
+declaracion_multiple: tipo_variable ID_NOMBRE_VAR_FUNC (COMA ID_NOMBRE_VAR_FUNC)*
                     ;
 
 //inicio matriz
@@ -163,7 +165,7 @@ asignacion_matriz: declaracion_matriz_ld IGUAL expresion
                   ;
 declaracion_matriz: tipo_variable declaracion_matriz_ld
                   ;
-declaracion_matriz_ld: ID_NOMBRE_VARIABLE (CA expresion CC) (CA expresion CC)?
+declaracion_matriz_ld: ID_NOMBRE_VAR_FUNC (CA expresion CC) (CA expresion CC)?
                       ;     
 //fin matriz
 
@@ -178,12 +180,14 @@ parametros_para_llamada: expresion COMA parametros_para_llamada
                        |
                        ;
 
-variable_o_parametro_aislada:tipo_variable ID_NOMBRE_VARIABLE
+variable_o_parametro_aislada:tipo_variable ID_NOMBRE_VAR_FUNC
                             ;
 
-declaracion_funcion: tipo_variable ID_NOMBRE_VARIABLE PA parametros_declaracion PC
+declaracion_funcion: tipo_variable ID_NOMBRE_VAR_FUNC PA parametros_declaracion PC
                    ;
-llamada_funcion: ID_NOMBRE_VARIABLE PA parametros_para_llamada PC
+bloque_funcion: declaracion_funcion bloque_instrucciones
+              ;
+llamada_funcion: ID_NOMBRE_VAR_FUNC PA parametros_para_llamada PC (CA expresion CC)? (CA expresion CC)?
               ;
 
 retorno_funcion: c_return
@@ -196,31 +200,40 @@ instrucciones : instruccion instrucciones
   |
   ;
 
-instrucciones_del_for: instruccion instruccion ID_NOMBRE_VARIABLE asignacion_ld
+bloque_instrucciones: LLAVE_APERTURA instrucciones LLAVE_CIERRE
+                    ;
+
+instrucciones_del_for: instruccion instruccion ID_NOMBRE_VAR_FUNC asignacion_ld
                    ;
+
+bloque_if: c_if comparacion instrucciones (c_elseif comparacion instrucciones )* (c_else instrucciones)?
+         ;
 
 COMENTARIO : '//' ~[\r\n]* -> skip;
 //incio funciones
 instruccion: declaracion_funcion FIN_DE_SENTENCIA
-           | declaracion_funcion LLAVE_APERTURA instrucciones LLAVE_CIERRE
+           //realmente no hace falta este bloque funcion  pero ya veremos..
+           | bloque_funcion //ver esta REGLA!!
            | retorno_funcion FIN_DE_SENTENCIA
            | llamada_funcion FIN_DE_SENTENCIA
            | COMENTARIO
            //fin de funciones
            | declaracion_y_asigancion_de_variable FIN_DE_SENTENCIA
            | asignacion FIN_DE_SENTENCIA
-           | LLAVE_APERTURA instrucciones LLAVE_CIERRE
-           | PA instrucciones PC
+           | bloque_instrucciones
+           //| PA instrucciones PC
            | c_while comparacion
            //ifs else ifs else inicio
-           | c_if comparacion
-           | c_elseif comparacion
-           | c_else
+           //| c_if comparacion
+           //| c_elseif comparacion
+           //| c_else
+           | bloque_if
            //fin ifs else ifs else inicio
            | c_for PA instrucciones_del_for PC
            | comparacion_sin_parentesis FIN_DE_SENTENCIA
            | operacion FIN_DE_SENTENCIA
            | instruccion_matriz FIN_DE_SENTENCIA
+           | expresion FIN_DE_SENTENCIA
            ;
 
 

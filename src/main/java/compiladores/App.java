@@ -29,7 +29,7 @@ public class App {
 
         // Conecto el objeto con Listeners al parser
         //stefanoo descomentar!!
-        //parser.addParseListener(escucha);
+        parser.addParseListener(escucha);
 
         // Solicito al parser que comience indicando una regla gramatical
         // En este caso la regla es el simbolo inicial
@@ -46,6 +46,9 @@ public class App {
         // Imprime el arbol obtenido
         // System.out.println(tree.toStringTree(parser));
         // System.out.println(escucha);
+
+        //TablaSimbolos.getInstance().toPrint();
+        
         
     }
 }

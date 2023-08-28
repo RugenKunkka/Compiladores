@@ -4,35 +4,43 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-class TablaSimbolos {
+class TablaSimbolos  {
     private static TablaSimbolos instance = null;
 
     List<HashMap<String, Identificador>> tabla;
+    ArrayList<NodoContext> historialContext;
 
-    TablaSimbolos(){
+    int cantidadDeContextos=0;
+    int nivelDeProfundidad=0;
+    private TablaSimbolos(){
         this.tabla =  new ArrayList<>();
         this.tabla.add(new HashMap<>());//esto que se agrega es el contexto a nivel global!!!! el resto seran agregados cada vez que se encuentre una llave
+        this.historialContext= new ArrayList<NodoContext>();
     }
 
-    public static TablaSimbolos getInstance() {
+    public static synchronized  TablaSimbolos getInstance() {
         if (instance == null) {
             instance = new TablaSimbolos();
         }
         return instance;
     }
 
-    void nuevoContexto() {
+    void crearContexto() {
         tabla.add(new HashMap<>());
+        this.cantidadDeContextos++;
+        this.nivelDeProfundidad++;
     }
 
     void eliminarContexto() {
         tabla.remove(tabla.size() - 1);
+        this.nivelDeProfundidad--;
     }
 
     void agregarId(Identificador identificador) {
         if (!tabla.isEmpty()) {
             if(!this.tabla.get(tabla.size()-1).keySet().contains(identificador.ID)){
                 tabla.get(tabla.size() - 1).put(identificador.ID, identificador);
+                historialContext.add(new NodoContext(this.nivelDeProfundidad, identificador));
                 return;
             } else {
                 System.out.println("El identificador ya existe en el contexto");
@@ -59,6 +67,12 @@ class TablaSimbolos {
 
     public void setTabla(List<HashMap<String, Identificador>> tabla) {
         this.tabla = tabla;
+    }
+
+    public void toPrint(){
+        for(NodoContext nodoContext :this.historialContext){
+            nodoContext.toPrint();
+        }
     }
     
 }
