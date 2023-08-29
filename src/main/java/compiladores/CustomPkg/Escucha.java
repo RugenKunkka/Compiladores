@@ -42,7 +42,7 @@ public class Escucha extends ExpRegBaseListener{
     @Override
     public void exitDeclaracion_y_asigancion_de_variable(Declaracion_y_asigancion_de_variableContext ctx) {
         String nombrePrimerVariable = ctx.ID_NOMBRE_VAR_FUNC().getText();
-        //System.out.println("TATATATA: "+nombrePrimerVariable);
+        //system.out.println("TATATATA: "+nombrePrimerVariable);
         int tipoVariable=ctx.tipo_variable().getStart().getType();
         Variable tempVariable = new Variable(nombrePrimerVariable,tipoVariable);
         ArrayList<Variable> variables= new ArrayList<Variable>();
@@ -59,12 +59,12 @@ public class Escucha extends ExpRegBaseListener{
             this.tablaSimbolos.agregarId(variable);
             aImprimir= aImprimir + variable.toString()+", ";
         }
-        System.out.println(aImprimir);
+        //system.out.println(aImprimir);
     }
 
     @Override
     public void enterBloque_instrucciones(Bloque_instruccionesContext ctx) {
-        System.out.println("Contexto nuevo!!!");
+        //system.out.println("Contexto nuevo!!!");
         this.tablaSimbolos.crearContexto();
         for(Identificador identificador: this.identificadoresTemp){
             this.tablaSimbolos.agregarId(identificador);
@@ -79,7 +79,7 @@ public class Escucha extends ExpRegBaseListener{
     @Override
     public void exitDeclaracion_funcion(Declaracion_funcionContext ctx) {
         Funcion funcion= new Funcion(ctx.ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
-        System.out.println("FUNCION: "+funcion.toString());
+        //system.out.println("FUNCION: "+funcion.toString());
 
     }
     @Override
@@ -90,7 +90,7 @@ public class Escucha extends ExpRegBaseListener{
             Funcion funcion = new Funcion(declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getText(), declaracionFuncionContext.tipo_variable().getStart().getType());
             Token idToken = declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getSymbol();
             String idTexto = idToken.getText();
-            System.out.println("EL PADRE ES!!!:"+ funcion.toString());
+            //system.out.println("EL PADRE ES!!!:"+ funcion.toString());
             this.tablaSimbolos.agregarId(funcion);
         }
         
@@ -102,7 +102,7 @@ public class Escucha extends ExpRegBaseListener{
     public void exitVariable_o_parametro_aislada(Variable_o_parametro_aisladaContext ctx) {
         Variable variableAislada= new Variable(ctx.ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
         this.identificadoresTemp.add(variableAislada);
-        System.out.println("VarAislada: "+variableAislada.toString());
+        //system.out.println("VarAislada: "+variableAislada.toString());
     }
 
     
@@ -129,9 +129,18 @@ public class Escucha extends ExpRegBaseListener{
     public void exitPrograma(ProgramaContext ctx) {
         // TODO Auto-generated method stub
         //super.exitPrograma(ctx);
-        System.out.println("TERMINO EL PROGRAMAAA???!!!");
-        this.tablaSimbolos.toPrint();
+        //system.out.println("TERMINO EL PROGRAMAAA???!!!");
+        //this.tablaSimbolos.toPrint();
         this.tablaSimbolos.saveTablaSimbolos();
+        if(this.tablaSimbolos.buscarId("batmensen")==null){
+            System.out.println("escucha variable no declarada: barmensen");
+        }
+
+        if(this.tablaSimbolos.buscarId("matriz")==null){
+            System.out.println("escucha !!!Variable no declarada: matriz");
+        } else {
+            System.out.println("escucha !!!Variable encontrada matriz!");
+        }
     }
 
     

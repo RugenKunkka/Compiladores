@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import compiladores.CustomPkg.Escucha;
+import compiladores.CustomPkg.MyVisitor;
 
 // Las diferentes entradas se explicaran oportunamente
 public class App {
@@ -39,10 +40,11 @@ public class App {
         //System.out.println(tree.toStringTree(parser));
         
         // Conectamos el visitor
-        // Caminante visitor = new Caminante();
-        // visitor.visit(tree);
-        // System.out.println(visitor);
-        // System.out.println(visitor.getErrorNodes());
+        MyVisitor myVisitor = new MyVisitor();
+        myVisitor.visit(tree);
+        System.out.println(myVisitor);
+        
+        //System.out.println(myVisitor.getErrorNodes());
         // Imprime el arbol obtenido
         // System.out.println(tree.toStringTree(parser));
         // System.out.println(escucha);

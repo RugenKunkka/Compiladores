@@ -1,4 +1,8 @@
+>ID:varVisitor tipoDato:11
 >ID:matriz tipoDato:11
+>ID:var1 tipoDato:11
+>ID:var2 tipoDato:11
+>ID:var3 tipoDato:11
 >ID:nose1 tipoDato:11
 >ID:globalX tipoDato:11
 >ID:globalParaVerSiConfundeCtx tipoDato:11
