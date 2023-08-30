@@ -47,7 +47,7 @@ class TablaSimbolos  {
                 historialContext.add(new NodoContext(this.nivelDeProfundidad, identificador));
                 return;
             } else {
-                System.out.println("El identificador ya existe en el contexto");
+                System.out.println("El identificador <-- "+identificador.getID()+" --> ya existe en el contexto");
                 return;
             }
         }
@@ -62,6 +62,7 @@ class TablaSimbolos  {
                 return id;
             }
         }
+        //System.out.println("No se encuentra declarada la variable: "+ID);
         return null;
     }
 
@@ -72,6 +73,7 @@ class TablaSimbolos  {
     public void setTabla(List<HashMap<String, Identificador>> tabla) {
         this.tabla = tabla;
     }
+
 
     public void toPrint(){
         for(NodoContext nodoContext :this.historialContext){
@@ -89,6 +91,18 @@ class TablaSimbolos  {
             System.out.println("Contenido guardado en " + filePath);
         } catch (IOException e) {
             System.err.println("Error al guardar el contenido en el archivo: " + e.getMessage());
+        }
+    }
+
+    public void addArgumentoFuncionMasCercana(int argumento){
+        for (int i = tabla.size() - 1; i >= 0; i--) {
+            HashMap<String, Identificador> contexto = tabla.get(i);
+            for (Identificador identificador : contexto.values()) {
+                if (identificador instanceof Funcion) {
+                    ((Funcion) identificador).addArgumento(argumento);
+                    return; // Terminamos después de agregar el argumento
+                }
+            }
         }
     }
     

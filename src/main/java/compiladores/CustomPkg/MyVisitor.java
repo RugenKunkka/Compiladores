@@ -2,6 +2,7 @@ package compiladores.CustomPkg;
 
 import compiladores.ExpRegBaseVisitor;
 import compiladores.ExpRegParser;
+import compiladores.ExpRegParser.Declaracion_y_asignacion_de_variableContext;
 import compiladores.ExpRegParser.FactorContext;
 import compiladores.ExpRegParser.InstruccionContext;
 import compiladores.ExpRegParser.InstruccionesContext;
@@ -29,6 +30,23 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         this.tablaSimbolos=TablaSimbolos.getInstance();
         System.out.println("INICIALIZAMOS LE VISITOR!!");
     }
+
+    //este metodoes el que nos va a permitir recorrer el árbol
+    @Override 
+    public String visit(ParseTree tree) {
+        // TODO Auto-generated method stub
+        return super.visit(tree);
+    }
+
+    @Override
+    public String visitDeclaracion_y_asignacion_de_variable(Declaracion_y_asignacion_de_variableContext ctx) {
+        TerminalNode nombreVarFuncNode=ctx.ID_NOMBRE_VAR_FUNC();
+        if(nombreVarFuncNode!=null){
+            System.out.println(nombreVarFuncNode.getText());
+        }
+        return null;
+    }
+
     //me interesa en esta parte buscar variables que estoy usando y no fueron declaradas
     @Override
     public String visitFactor(FactorContext ctx) {
@@ -83,13 +101,8 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         return texto;
     }
 
-    //este metodoes el que nos va a permitir recorrer el árbol
-    @Override 
-    public String visit(ParseTree tree) {
-        // TODO Auto-generated method stub
-        return super.visit(tree);
-    }
     
+    //--------------------------------------
     private void initString(){
         texto="\nMiVisitor\n |\n +---> ";
         this.indent= -1;

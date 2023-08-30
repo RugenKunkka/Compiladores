@@ -1,1 +1,29 @@
-====>ID:j tipoDato:11
+>ID:varVisitor tipoDato:11
+>ID:matriz tipoDato:11
+>ID:var1 tipoDato:11
+>ID:var2 tipoDato:11
+>ID:var3 tipoDato:11
+>ID:nose1 tipoDato:11
+>ID:globalX tipoDato:11
+>ID:globalParaVerSiConfundeCtx tipoDato:11
+>ID:j tipoDato:11
+>ID:suma tipoDato:11 argumentos: 11 11 
+====>ID:x tipoDato:11
+====>ID:y tipoDato:11
+====>ID:c tipoDato:11
+>ID:funcionHardcodeada1 tipoDato:11 argumentos: 
+>ID:funcionHardcodeada2 tipoDato:11 argumentos: 
+>ID:funcionUsaGlobal tipoDato:11 argumentos: 
+>ID:main tipoDato:11 argumentos: 
+====>ID:globalParaVerSiConfundeCtx tipoDato:11
+====>ID:matriz tipoDato:11
+====>ID:x tipoDato:11
+====>ID:y tipoDato:11
+====>ID:c tipoDato:11
+========>ID:h tipoDato:11
+========>ID:k tipoDato:12
+========>ID:x tipoDato:11
+========>ID:x tipoDato:11
+========>ID:x tipoDato:11
+====>ID:variableFinalContext1 tipoDato:11
+>ID:variableFinalContext_2 tipoDato:11

@@ -118,13 +118,11 @@ c_while:'while';
 bloque_while: c_while comparacion (bloque_instrucciones | instruccion);
 
 c_for:'for';
-bloque_for: c_for (instruccion|bloque_instrucciones);
+bloque_for: c_for PA instrucciones_del_for PC (instruccion | bloque_instrucciones);
 
 c_if:'if';
 c_elseif:'else if';
 c_else:'else';
-//antes bloque_instrucciones estaba instrucciones. consultar con el profe
-bloque_if: c_if comparacion (bloque_instrucciones|instruccion) (c_elseif comparacion (bloque_instrucciones|instruccion) )* (c_else (bloque_instrucciones|instruccion))?;
 
 c_return:'return';
 
@@ -148,7 +146,7 @@ asignacion_ld: //IGUAL NUMERO asignacion_ld // la recursividad la vas a repetir 
            | IGUAL operacion
            |;
 
-declaracion_y_asigancion_de_variable : tipo_variable ID_NOMBRE_VAR_FUNC asignacion_ld
+declaracion_y_asignacion_de_variable : tipo_variable ID_NOMBRE_VAR_FUNC asignacion_ld
                                      //| ID_NOMBRE_VAR_FUNC asignacion_ld
                                      ;
 
@@ -211,6 +209,8 @@ bloque_instrucciones: LLAVE_APERTURA instrucciones LLAVE_CIERRE
 
 instrucciones_del_for: instruccion instruccion ID_NOMBRE_VAR_FUNC asignacion_ld
                    ;
+//antes bloque_instrucciones estaba instrucciones. consultar con el profe
+bloque_if: c_if comparacion (bloque_instrucciones|instruccion) (c_elseif comparacion (bloque_instrucciones|instruccion) )* (c_else (bloque_instrucciones|instruccion))?;
 
 COMENTARIO : '//' ~[\r\n]* -> skip;
 
@@ -226,7 +226,7 @@ instruccion:
            | llamada_funcion FIN_DE_SENTENCIA
            | COMENTARIO
            //fin de funciones
-           | declaracion_y_asigancion_de_variable FIN_DE_SENTENCIA
+           | declaracion_y_asignacion_de_variable FIN_DE_SENTENCIA
            | asignacion FIN_DE_SENTENCIA
            //| PA instrucciones PC
            //| c_while comparacion
