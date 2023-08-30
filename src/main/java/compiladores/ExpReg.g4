@@ -115,16 +115,22 @@ factor: PA expresion PC
 //ciclos y condicionales
 //la C es de custom
 c_while:'while';
+bloque_while: c_while comparacion (bloque_instrucciones | instruccion);
+
 c_for:'for';
+bloque_for: c_for (instruccion|bloque_instrucciones);
+
 c_if:'if';
 c_elseif:'else if';
 c_else:'else';
+//antes bloque_instrucciones estaba instrucciones. consultar con el profe
+bloque_if: c_if comparacion (bloque_instrucciones|instruccion) (c_elseif comparacion (bloque_instrucciones|instruccion) )* (c_else (bloque_instrucciones|instruccion))?;
 
 c_return:'return';
 
 WS : [ \n\t\r] -> skip ;//descarta todo lo espaciado por ende no le va a interesar si el ; el = etc.. estan a continuacion o con espacio entre los unos y los otros
 
-programa : instrucciones <EOF>;
+
 //PA s PC s
 
 tipo_variable : TIPO_INT 
@@ -206,12 +212,14 @@ bloque_instrucciones: LLAVE_APERTURA instrucciones LLAVE_CIERRE
 instrucciones_del_for: instruccion instruccion ID_NOMBRE_VAR_FUNC asignacion_ld
                    ;
 
-bloque_if: c_if comparacion instrucciones (c_elseif comparacion instrucciones )* (c_else instrucciones)?
-         ;
-
 COMENTARIO : '//' ~[\r\n]* -> skip;
+
+programa : instrucciones
+         | bloque_instrucciones;
+
 //incio funciones
-instruccion: declaracion_funcion FIN_DE_SENTENCIA
+instruccion: 
+            declaracion_funcion FIN_DE_SENTENCIA
            //realmente no hace falta este bloque funcion  pero ya veremos..
            | bloque_funcion //ver esta REGLA!!
            | retorno_funcion FIN_DE_SENTENCIA
@@ -220,16 +228,17 @@ instruccion: declaracion_funcion FIN_DE_SENTENCIA
            //fin de funciones
            | declaracion_y_asigancion_de_variable FIN_DE_SENTENCIA
            | asignacion FIN_DE_SENTENCIA
-           | bloque_instrucciones
            //| PA instrucciones PC
-           | c_while comparacion
+           //| c_while comparacion
+           | bloque_while
            //ifs else ifs else inicio
            //| c_if comparacion
            //| c_elseif comparacion
            //| c_else
            | bloque_if
            //fin ifs else ifs else inicio
-           | c_for PA instrucciones_del_for PC
+           | bloque_for
+           //| c_for PA instrucciones_del_for PC
            | comparacion_sin_parentesis FIN_DE_SENTENCIA
            | operacion FIN_DE_SENTENCIA
            | instruccion_matriz FIN_DE_SENTENCIA

@@ -41,8 +41,8 @@ public class App {
         
         // Conectamos el visitor
         MyVisitor myVisitor = new MyVisitor();
-        myVisitor.visit(tree);
-        System.out.println(myVisitor);
+        //myVisitor.visit(tree);
+        //System.out.println(myVisitor);
         
         //System.out.println(myVisitor.getErrorNodes());
         // Imprime el arbol obtenido

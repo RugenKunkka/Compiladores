@@ -132,15 +132,6 @@ public class Escucha extends ExpRegBaseListener{
         //system.out.println("TERMINO EL PROGRAMAAA???!!!");
         //this.tablaSimbolos.toPrint();
         this.tablaSimbolos.saveTablaSimbolos();
-        if(this.tablaSimbolos.buscarId("batmensen")==null){
-            System.out.println("escucha variable no declarada: barmensen");
-        }
-
-        if(this.tablaSimbolos.buscarId("matriz")==null){
-            System.out.println("escucha !!!Variable no declarada: matriz");
-        } else {
-            System.out.println("escucha !!!Variable encontrada matriz!");
-        }
     }
 
     

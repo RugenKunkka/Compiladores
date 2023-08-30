@@ -5,7 +5,7 @@ abstract class Identificador {
     int tipoDato;
     Boolean usada;
     Boolean inicializada;
-
+    //linea en la que se declaro la variable creo que me haria falta y lineas en las que se usa la variable también
     Identificador(String ID, int tipoVariable) {
         this.ID = ID;
         this.tipoDato=tipoVariable;

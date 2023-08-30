@@ -61,9 +61,9 @@ int main (){
     while(x<3){
         int x=5;
     }
-    while(x<(3-5*2))
+    while(x<(3-5*2)){
         int x=5;
-    
+    }
 
     while(x<=(3-5*2)){
         int x=5;
