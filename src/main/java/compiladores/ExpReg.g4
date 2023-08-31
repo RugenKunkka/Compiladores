@@ -143,6 +143,7 @@ asignacion_ld: //IGUAL NUMERO asignacion_ld // la recursividad la vas a repetir 
            //| IGUAL ID_NOMBRE_VAR_FUNC asignacion_ld
              IGUAL expresion asignacion_ld
            | COMA ID_NOMBRE_VAR_FUNC asignacion_ld
+           | COMA NUMERO asignacion_ld
            | IGUAL operacion
            |;
 

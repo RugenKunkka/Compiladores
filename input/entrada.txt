@@ -1,76 +1,11 @@
-batmensen;
-
-int varVisitor;
-
-int matriz[2][4];
-int matriz[2][4];
-int var1,var2,var3;
-int nose1;
-int globalX;
-int globalParaVerSiConfundeCtx;
-int j;
-
-int suma(int x, int y){
-    int c;
-    c=x+y;
-    suma(2,3);
-
-    return c;
-}
-
-int funcionHardcodeada1 (){
-    return 2;
-}
-
-int funcionHardcodeada2 (){
-    return (2*5+2);
-}
-
-int funcionUsaGlobal(){
-    return globalX;
-}
-
-int main (){
-    int globalParaVerSiConfundeCtx;
-    getMatriz()[2][3];
-    int matriz[2][3];
-    int matriz[2][3]=2;
-    matriz[2][3]=5;
-    matriz[2][3];
-
-    int x=2;
-    int y=3;
-    int c=x*y;
-
-    suma(x , y);
-    suma(x , 4);
-    suma(3 , 4);
-    suma(3+3*4 , 4*x);
-    
-    if(2>3){
-        int h=3;
-    } else if( 3<2){
-        float k =2;
-    } else {
-
-    }
-    x;
-    2;
-    MATRIZ[1][2*4+5+(3/4)];
-    //MATRIZ[1][suma(3,5)];
-    while(x<3){
-        int x=5;
-    }
-    while(x<(3-5*2)){
-        int x=5;
-    }
-
-    while(x<=(3-5*2)){
-        int x=5;
-        y=3;
-        y=j+5*8%9;
-    }
-    int variableFinalContext1;
-}
-
-int variableFinalContext_2;
+//declaraciones simples, multiples
+//y asignaciones simpl y mult OK
+int x,y,z=1,2,3;
+int a,b;
+int c;
+int c=6;
+j;
+7;
+int matriz[5][5];
+int matriz[0][1]=2;
+int matriz[10][10];

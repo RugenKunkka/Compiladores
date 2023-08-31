@@ -42,7 +42,6 @@ public class App {
         // Conectamos el visitor
         MyVisitor myVisitor = new MyVisitor();
         myVisitor.visit(tree);
-        //myVisitor.visitDeclaracion_y_asignacion_de_variable(tree);
         //System.out.println(myVisitor);
         
         //System.out.println(myVisitor.getErrorNodes());

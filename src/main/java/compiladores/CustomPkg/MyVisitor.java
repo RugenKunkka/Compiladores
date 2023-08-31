@@ -2,6 +2,7 @@ package compiladores.CustomPkg;
 
 import compiladores.ExpRegBaseVisitor;
 import compiladores.ExpRegParser;
+import compiladores.ExpRegParser.Asignacion_ldContext;
 import compiladores.ExpRegParser.Declaracion_y_asignacion_de_variableContext;
 import compiladores.ExpRegParser.FactorContext;
 import compiladores.ExpRegParser.InstruccionContext;
@@ -34,32 +35,91 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     //este metodoes el que nos va a permitir recorrer el árbol
     @Override 
     public String visit(ParseTree tree) {
-        // TODO Auto-generated method stub
         return super.visit(tree);
     }
 
     @Override
     public String visitDeclaracion_y_asignacion_de_variable(Declaracion_y_asignacion_de_variableContext ctx) {
-        TerminalNode nombreVarFuncNode=ctx.ID_NOMBRE_VAR_FUNC();
-        if(nombreVarFuncNode!=null){
-            System.out.println(nombreVarFuncNode.getText());
+        
+        
+        Asignacion_ldContext asignacionLdContext=ctx.asignacion_ld();
+        //si el hijo asignacion_ld existe y tiene un nodo coma conectado, ya sabés que hay una declaración múltiple
+        if(asignacionLdContext!=null && asignacionLdContext.COMA()!=null){
+            //ejemplo intx,y,z=1,2,3
+            String sentenciaMultiple = ctx.getText();
+            String[] splitedResult=sentenciaMultiple.split("=");
+            splitedResult[0]=this.removeVariableTypeOfSentence(splitedResult[0]);
+            String[] splitedVariables=splitedResult[0].split(",");
+            if(splitedResult.length>1){
+                
+                String[] splitedValueToAssign=splitedResult[1].split(",");
+                if(splitedVariables.length == splitedValueToAssign.length){
+                    for(int i=0; i<splitedVariables.length;i++){
+                        System.out.println(splitedVariables[i]+"="+splitedValueToAssign[i]);
+                    }
+                } else {
+                    for(int i=0; i<splitedVariables.length;i++){
+                        System.out.println(splitedVariables[i]+"="+splitedValueToAssign[0]);
+                    }
+                }
+            }
+            //quiere decir que es solo una declaracion y no una asignacion
+            else{
+                for(int i=0; i<splitedVariables.length;i++){
+                        System.out.println(splitedVariables[i]);
+                    }
+            }
+            
+            
         }
+        /*if(nombreVarFuncNode!=null){
+            System.out.print(nombreVarFuncNode.getText());
+        }
+        visitAllHijos(ctx);*/
+        
+
+        
         return null;
     }
 
-    //me interesa en esta parte buscar variables que estoy usando y no fueron declaradas
+
+    private String removeVariableTypeOfSentence(String string){
+        String stringToReturn= string.replace("int", "");
+        stringToReturn= stringToReturn.replace("float", "");
+        stringToReturn= stringToReturn.replace("double", "");
+        stringToReturn= stringToReturn.replace("char", "");
+        return stringToReturn;
+    }
+
+    @Override
+    public String visitAsignacion_ld(Asignacion_ldContext ctx) {
+        TerminalNode igualNode=ctx.IGUAL();
+        TerminalNode comaNode=ctx.COMA();
+        TerminalNode idNode=ctx.ID_NOMBRE_VAR_FUNC();
+        if(igualNode!=null){
+            System.out.print(igualNode.getText());
+        }
+        if(comaNode!=null){
+            System.out.println("");
+        }
+        if(idNode!=null){
+            System.out.println(idNode.getText());
+        }
+        visitAllHijos(ctx);
+        return null;
+    }
+
     @Override
     public String visitFactor(FactorContext ctx) {
-        
-        TerminalNode nodoIdNombreVarFun=ctx.ID_NOMBRE_VAR_FUNC();
-        if(nodoIdNombreVarFun!=null){
-            String idVariable = nodoIdNombreVarFun.getText();
-            System.out.println(idVariable);
-            if(tablaSimbolos.buscarId(idVariable)==null){
-                System.out.println("La variable '"+idVariable+"'No se encuentra declarada");
-            }
+        ctx.getParent().getParent().getParent();
+        TerminalNode numeroNode=ctx.NUMERO();
+        TerminalNode idNombreVarFuncNode=ctx.ID_NOMBRE_VAR_FUNC();
+        if(numeroNode!=null){
+            System.out.println(numeroNode.getText());
+        } else if(idNombreVarFuncNode!=null){
+            System.out.println(idNombreVarFuncNode.getText());
         }
-        
+        visitAllHijos(ctx);
         return null;
     }
 
@@ -74,20 +134,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         visitAllHijos(ctx);
         // texto += "} >- \n";
         return texto;
-    }
-
-    @Override
-    public String visitInstrucciones(ExpRegParser.InstruccionesContext ctx) {
-        addTextoNodo(ctx, "instrucciones");
-        visitAllHijos(ctx.getRuleContext());
-        return null;
-    }
-
-    @Override
-    public String visitInstruccion(InstruccionContext ctx) {
-        addTextoNodo(ctx, "instruccion");
-        visitAllHijos(ctx.getRuleContext());
-        return null;
     }
 
     //esta funcion es para poder visitar todos los hijos ya que ANTLR no lo hace!!
