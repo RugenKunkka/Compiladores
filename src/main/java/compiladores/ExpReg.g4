@@ -47,6 +47,13 @@ operadores:MAS
           |DIVISION
           |MODULO
           ;
+operadores_de_menor_orden:MAS
+                         |MENOS
+                        ;
+operadores_mayor_orden:MULTIPLICACION
+                      |DIVISION
+                      |MODULO
+                      ;
 
 operacion: expresion operacion_ld
          ;
@@ -85,14 +92,11 @@ deja las sumas para el ultimo por lo tanto come mas memoria xq siempre va a reso
 primero la multiplicacion por ej x=xs+2*5-4
 va a leer hasta xs pero dsps va a resolver la multiplicacion y recien ahi va a parar a la suma y a la resta
 */
-expresion: expresion MAS termino
-         | expresion MENOS termino
+expresion: expresion operadores_de_menor_orden termino
          | termino
          ;
 
-termino: termino MULTIPLICACION factor
-       | termino DIVISION factor
-       | termino MODULO factor
+termino: termino operadores_mayor_orden factor
        | factor
        ;
 
