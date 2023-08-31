@@ -1,1 +1,3 @@
 >ID:x tipoDato:11
+====>ID:i tipoDato:11
+====>ID:o tipoDato:11
