@@ -3,11 +3,16 @@ package compiladores.CustomPkg;
 import compiladores.ExpRegBaseVisitor;
 import compiladores.ExpRegParser;
 import compiladores.ExpRegParser.Asignacion_ldContext;
+import compiladores.ExpRegParser.Bloque_funcionContext;
+import compiladores.ExpRegParser.Bloque_instruccionesContext;
+import compiladores.ExpRegParser.Declaracion_funcionContext;
 import compiladores.ExpRegParser.Declaracion_y_asignacion_de_variableContext;
 import compiladores.ExpRegParser.FactorContext;
 import compiladores.ExpRegParser.InstruccionContext;
 import compiladores.ExpRegParser.InstruccionesContext;
+import compiladores.ExpRegParser.Parametros_declaracionContext;
 import compiladores.ExpRegParser.ProgramaContext;
+import compiladores.ExpRegParser.TerminoContext;
 
 import java.util.ArrayList;
 
@@ -22,6 +27,9 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     String texto;
     Integer indent;//controla para que salga como un arbolito bien en base al nivel de profundidad respecto de la raiz del árbol
     ArrayList<ErrorNode> errores;
+
+    int labelEIndex=0;
+    int variableTempIndex=0;
 
     TablaSimbolos tablaSimbolos;
 
@@ -44,6 +52,8 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         
         Asignacion_ldContext asignacionLdContext=ctx.asignacion_ld();
         //si el hijo asignacion_ld existe y tiene un nodo coma conectado, ya sabés que hay una declaración múltiple
+        //int x,y,z =2,3,4;  
+        //int x,y,z=2; Estos casos son los que contempla
         if(asignacionLdContext!=null && asignacionLdContext.COMA()!=null){
             //ejemplo intx,y,z=1,2,3
             String sentenciaMultiple = ctx.getText();
@@ -64,20 +74,34 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 }
             }
             //quiere decir que es solo una declaracion y no una asignacion
+            //contempla el int x=3;
             else{
-                for(int i=0; i<splitedVariables.length;i++){
-                        System.out.println(splitedVariables[i]);
-                    }
+                
             }
             
             
+        } else{
+            String codigoIntermedio="";
+                codigoIntermedio+=ctx.ID_NOMBRE_VAR_FUNC().getText();
+                Asignacion_ldContext asignacionLdContext2=ctx.asignacion_ld();
+                if(asignacionLdContext2!=null && asignacionLdContext2.IGUAL()!=null)
+                {
+                    codigoIntermedio+="=";
+                }
+                /*if(){
+
+                }*/
+                System.out.println(codigoIntermedio);
         }
-        /*if(nombreVarFuncNode!=null){
-            System.out.print(nombreVarFuncNode.getText());
-        }
-        visitAllHijos(ctx);*/
+        visitAllHijos(ctx);
         
 
+        
+        return null;
+    }
+
+    @Override
+    public String visitTermino(TerminoContext ctx) {
         
         return null;
     }
@@ -100,7 +124,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
             System.out.print(igualNode.getText());
         }
         if(comaNode!=null){
-            System.out.println("");
+            //System.out.println("");
         }
         if(idNode!=null){
             System.out.println(idNode.getText());
@@ -110,21 +134,16 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     }
 
     @Override
+    public String visitInstruccion(InstruccionContext ctx) {
+        System.out.println("");
+        this.visitAllHijos(ctx);
+        return null;
+    }
+
+    @Override
     public String visitFactor(FactorContext ctx) {
         
-        /*if(ctx.getParent()!=null && ctx.getParent().getParent()!=null &&
-            ctx.getParent().getParent().getParent()!=null && ctx.getParent().getParent().getParent() instanceof 
-        ){
-
-        }*/
         
-        TerminalNode numeroNode=ctx.NUMERO();
-        TerminalNode idNombreVarFuncNode=ctx.ID_NOMBRE_VAR_FUNC();
-        if(numeroNode!=null){
-            System.out.println(numeroNode.getText());
-        } else if(idNombreVarFuncNode!=null){
-            System.out.println(idNombreVarFuncNode.getText());
-        }
         visitAllHijos(ctx);
         return null;
     }
@@ -153,6 +172,45 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         return texto;
     }
 
+    //Testeado con funciones!!
+    @Override
+    public String visitBloque_funcion(Bloque_funcionContext ctx) {
+        System.out.println("//Declaracion de la funcion --> "+ctx.declaracion_funcion().ID_NOMBRE_VAR_FUNC().getText());
+        System.out.println("lbl e"+this.labelEIndex);
+        this.labelEIndex++;
+        //tengo que saber cuantas variables tiene declaradas en los parentesis
+        //primer variable se saca asi nomas el resto con algo de recursividad
+        Declaracion_funcionContext declaracionFuncionContext=ctx.declaracion_funcion();
+        Parametros_declaracionContext parametroDeclaracionContext=declaracionFuncionContext.parametros_declaracion();
+        boolean existe=true;
+        while(parametroDeclaracionContext!=null){
+            
+            System.out.println("POP "+parametroDeclaracionContext.variable_o_parametro_aislada().ID_NOMBRE_VAR_FUNC().getText());
+            parametroDeclaracionContext=parametroDeclaracionContext.parametros_declaracion();
+        }
+        
+        //de alguna forma tengo que generar el codigo
+        System.out.println("-------falta bloque inst-------");
+        System.out.println("PUSH t"+this.variableTempIndex);
+        System.out.println("jpm Me falta saber a donde debo saltar <---");
+        return null;
+    }
+
+    @Override
+    public String visitBloque_instrucciones(Bloque_instruccionesContext ctx) {
+        this.visitAllHijos(ctx);
+        return null;
+    }
+    
+    
+
+    
+
+    @Override
+    public String visitParametros_declaracion(Parametros_declaracionContext ctx) {
+        System.out.println("POP "+ctx.variable_o_parametro_aislada().ID_NOMBRE_VAR_FUNC());
+        return null;
+    }
     
     //--------------------------------------
     private void initString(){

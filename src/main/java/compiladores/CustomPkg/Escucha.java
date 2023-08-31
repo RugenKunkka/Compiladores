@@ -58,7 +58,10 @@ public class Escucha extends ExpRegBaseListener{
 
         Asignacion_ldContext tempAsignacion_ld=ctx.asignacion_ld();
         while(tempAsignacion_ld!=null && tempAsignacion_ld.COMA()!=null){
-            variables.add(new Variable(tempAsignacion_ld.ID_NOMBRE_VAR_FUNC().getText(), tipoVariable));
+            //if(tempAsignacion_ld.ID_NOMBRE_VAR_FUNC()!=null){
+                variables.add(new Variable(tempAsignacion_ld.ID_NOMBRE_VAR_FUNC().getText(), tipoVariable));
+            //}
+            
             tempAsignacion_ld=tempAsignacion_ld.asignacion_ld();
         }
 

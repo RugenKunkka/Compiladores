@@ -1,7 +1,0 @@
->ID:x tipoDato:11
->ID:y tipoDato:11
->ID:z tipoDato:11
->ID:a tipoDato:11
->ID:b tipoDato:11
->ID:c tipoDato:11
->ID:matriz tipoDato:11

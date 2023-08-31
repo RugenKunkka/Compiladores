@@ -11,9 +11,6 @@ package compiladores;
 fragment LETRA : [a-zA-Z] ;
 
 //estas 2 reglas de abajo comentadas me molestan. tendria que preguntar como evitar que molesten o como concatenar las relas para que quede igual que letra
-//fragment LETRAMINUSCULA : [a-z] ;
-//fragment LETRAMAYUSCULA : [A-Z] ;
-
 
 fragment DIGITO : [0-9] ;
 PA : '(';
@@ -51,14 +48,11 @@ operadores:MAS
           |MODULO
           ;
 
-operacion: expresion operacion_ld //ID_NOMBRE_VAR_FUNC operacion_ld
-         //| NUMERO operacion_ld
+operacion: expresion operacion_ld
          ;
 
 //ld es lado derecho
-operacion_ld: //(operadores ID_NOMBRE_VAR_FUNC) operacion_ld*
-            //| (operadores NUMERO) operacion_ld*
-            (operadores expresion) operacion_ld*
+operacion_ld: (operadores expresion) operacion_ld*
             ;
 
 //inicio comparadores y comparaciones
@@ -79,11 +73,7 @@ comparadores:CMP_IGUAL
 
 
 
-comparacion_sin_parentesis: //NUMERO comparadores NUMERO
-                          //| NUMERO comparadores ID_NOMBRE_VAR_FUNC
-                          //| ID_NOMBRE_VAR_FUNC comparadores ID_NOMBRE_VAR_FUNC
-                          //| ID_NOMBRE_VAR_FUNC comparadores NUMERO
-                          expresion comparadores expresion
+comparacion_sin_parentesis: expresion comparadores expresion
                           ;
 comparacion: PA comparacion_sin_parentesis PC;
 
@@ -139,16 +129,13 @@ asignacion: ID_NOMBRE_VAR_FUNC IGUAL expresion
           ;
 
 //lado derecho de la
-asignacion_ld: //IGUAL NUMERO asignacion_ld // la recursividad la vas a repetir para caso en el cual sepas que se puede repetir
-           //| IGUAL ID_NOMBRE_VAR_FUNC asignacion_ld
-             IGUAL expresion asignacion_ld
+asignacion_ld: IGUAL expresion asignacion_ld
            | COMA ID_NOMBRE_VAR_FUNC asignacion_ld
            | COMA NUMERO asignacion_ld
            | IGUAL operacion
            |;
 
 declaracion_y_asignacion_de_variable : tipo_variable ID_NOMBRE_VAR_FUNC asignacion_ld
-                                     //| ID_NOMBRE_VAR_FUNC asignacion_ld
                                      ;
 
 declaracion_multiple: tipo_variable ID_NOMBRE_VAR_FUNC (COMA ID_NOMBRE_VAR_FUNC)*
@@ -202,14 +189,11 @@ retorno_funcion: c_return
 
 
 instrucciones : instruccion instrucciones
-  |
-  ;
+              | ;
 
-bloque_instrucciones: LLAVE_APERTURA instrucciones LLAVE_CIERRE
-                    ;
+bloque_instrucciones: LLAVE_APERTURA instrucciones LLAVE_CIERRE ;
 
-instrucciones_del_for: instruccion instruccion ID_NOMBRE_VAR_FUNC asignacion_ld
-                   ;
+instrucciones_del_for: instruccion instruccion ID_NOMBRE_VAR_FUNC asignacion_ld ;
 //antes bloque_instrucciones estaba instrucciones. consultar con el profe
 bloque_if: c_if comparacion (bloque_instrucciones|instruccion) (c_elseif comparacion (bloque_instrucciones|instruccion) )* (c_else (bloque_instrucciones|instruccion))?;
 
