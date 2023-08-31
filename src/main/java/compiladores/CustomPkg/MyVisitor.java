@@ -111,7 +111,13 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitFactor(FactorContext ctx) {
-        ctx.getParent().getParent().getParent();
+        
+        /*if(ctx.getParent()!=null && ctx.getParent().getParent()!=null &&
+            ctx.getParent().getParent().getParent()!=null && ctx.getParent().getParent().getParent() instanceof 
+        ){
+
+        }*/
+        
         TerminalNode numeroNode=ctx.NUMERO();
         TerminalNode idNombreVarFuncNode=ctx.ID_NOMBRE_VAR_FUNC();
         if(numeroNode!=null){
