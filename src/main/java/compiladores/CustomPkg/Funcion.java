@@ -13,6 +13,11 @@ class Funcion extends Identificador {
         this.argumentos = new ArrayList<>();
     }
 
+    Funcion(String ID,int tipoDato,Boolean esInicializada) {
+        super(ID,tipoDato,esInicializada);
+        this.argumentos = new ArrayList<>();
+    }
+
     void addArgumento(int argumento){
         this.argumentos.add(argumento);
     }

@@ -1,2 +1,2 @@
->ID:x tipoDato:11
->ID:y tipoDato:11
+>ID:u tipoDato:11 esUsada?: false EstaInicializada?:false
+>ID:j tipoDato:11 esUsada?: false EstaInicializada?:true

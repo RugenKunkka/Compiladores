@@ -13,6 +13,13 @@ abstract class Identificador {
         this.inicializada = false;
     }
 
+    Identificador(String ID, int tipoVariable,Boolean esInicializada) {
+        this.ID = ID;
+        this.tipoDato=tipoVariable;
+        this.usada = false;
+        this.inicializada = esInicializada;
+    }
+
     public String getID() {
         return ID;
     }
@@ -49,7 +56,7 @@ abstract class Identificador {
     public String toString() {
         // TODO Auto-generated method stub
         String stringToReturn="";
-        stringToReturn=("ID:"+this.ID+" tipoDato:"+this.tipoDato );
+        stringToReturn=("ID:"+this.ID+" tipoDato:"+this.tipoDato+" esUsada?: "+this.usada+" EstaInicializada?:" + this.inicializada);
         return stringToReturn;
     }
 

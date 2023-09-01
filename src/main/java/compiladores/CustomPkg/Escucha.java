@@ -50,18 +50,18 @@ public class Escucha extends ExpRegBaseListener{
     @Override
     public void exitDeclaracion_y_asignacion_de_variable(Declaracion_y_asignacion_de_variableContext ctx) {
         String nombrePrimerVariable = ctx.ID_NOMBRE_VAR_FUNC().getText();
-        //system.out.println("TATATATA: "+nombrePrimerVariable);
         int tipoVariable=ctx.tipo_variable().getStart().getType();
-        Variable tempVariable = new Variable(nombrePrimerVariable,tipoVariable);
+
+        boolean fueInicializada=ctx.asignacion_ld().getChildCount()>0?true:false;
+
+        Variable tempVariable = new Variable(nombrePrimerVariable,tipoVariable,fueInicializada);
         ArrayList<Variable> variables= new ArrayList<Variable>();
         variables.add(tempVariable);
 
         Asignacion_ldContext tempAsignacion_ld=ctx.asignacion_ld();
+        //este while es para meter por ej en el contexto del if las variables que tiene como parámetro
         while(tempAsignacion_ld!=null && tempAsignacion_ld.COMA()!=null){
-            //if(tempAsignacion_ld.ID_NOMBRE_VAR_FUNC()!=null){
-                variables.add(new Variable(tempAsignacion_ld.ID_NOMBRE_VAR_FUNC().getText(), tipoVariable));
-            //}
-            
+            variables.add(new Variable(tempAsignacion_ld.ID_NOMBRE_VAR_FUNC().getText(), tipoVariable,fueInicializada));
             tempAsignacion_ld=tempAsignacion_ld.asignacion_ld();
         }
 
@@ -70,7 +70,7 @@ public class Escucha extends ExpRegBaseListener{
             this.tablaSimbolos.agregarId(variable);
             aImprimir= aImprimir + variable.toString()+", ";
         }
-        //system.out.println(aImprimir);
+        
     }
 
     @Override
@@ -197,8 +197,13 @@ public class Escucha extends ExpRegBaseListener{
         if(ctx.ID_NOMBRE_VAR_FUNC()!=null)
         {
             String nombreVariable=ctx.ID_NOMBRE_VAR_FUNC().getText();
-            if(this.tablaSimbolos.buscarId(nombreVariable)==null){
+            Identificador existId=this.tablaSimbolos.buscarId(nombreVariable);
+            if(existId==null){
                 System.out.println("No se encuentra declarada la variable: "+nombreVariable);
+            } 
+            //si la variable existe, voy y busco para setearla como que está siendo usada
+            else if (existId!=null){
+                existId.setUsada(true);
             }
         }
     }
@@ -224,6 +229,8 @@ public class Escucha extends ExpRegBaseListener{
     public void enterParametros_para_llamada(Parametros_para_llamadaContext ctx) {
         this.bufferTempParametrosParaLlamada++;
     }
+    
+
     
 
 }
