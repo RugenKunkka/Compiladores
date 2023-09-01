@@ -112,7 +112,9 @@ c_while:'while';
 bloque_while: c_while comparacion (bloque_instrucciones | instruccion);
 
 c_for:'for';
-bloque_for: c_for PA instrucciones_del_for PC (instruccion | bloque_instrucciones);
+bloque_for: c_for PA instruccion comparacion_sin_parentesis FIN_DE_SENTENCIA actualizacion_del_for PC (instruccion | bloque_instrucciones);
+actualizacion_del_for: ID_NOMBRE_VAR_FUNC MAS MAS
+                     ;
 
 c_if:'if';
 c_elseif:'else if';
@@ -148,7 +150,6 @@ declaracion_multiple: tipo_variable ID_NOMBRE_VAR_FUNC (COMA ID_NOMBRE_VAR_FUNC)
 //inicio matriz
 instruccion_matriz: declaracion_matriz
                   | asignacion_matriz
-                  | declaracion_y_asignacion_matriz
                   | declaracion_matriz_ld
                   ;
 instruccion_matriz_forma_generica:tipo_variable? declaracion_matriz_ld (IGUAL expresion)?
@@ -197,7 +198,7 @@ instrucciones : instruccion instrucciones
 
 bloque_instrucciones: LLAVE_APERTURA instrucciones LLAVE_CIERRE ;
 
-instrucciones_del_for: instruccion instruccion ID_NOMBRE_VAR_FUNC asignacion_ld ;
+instrucciones_del_for: instruccion comparacion ID_NOMBRE_VAR_FUNC asignacion_ld ;
 //antes bloque_instrucciones estaba instrucciones. consultar con el profe
 bloque_if: c_if comparacion (bloque_instrucciones|instruccion) (c_elseif comparacion (bloque_instrucciones|instruccion) )* (c_else (bloque_instrucciones|instruccion))?;
 

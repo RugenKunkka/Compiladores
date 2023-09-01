@@ -2,7 +2,11 @@ package compiladores.CustomPkg;
 
 import compiladores.ExpRegBaseVisitor;
 import compiladores.ExpRegParser;
+import compiladores.ExpRegParser.Actualizacion_del_forContext;
+import compiladores.ExpRegParser.AsignacionContext;
 import compiladores.ExpRegParser.Asignacion_ldContext;
+import compiladores.ExpRegParser.Asignacion_matrizContext;
+import compiladores.ExpRegParser.Bloque_forContext;
 import compiladores.ExpRegParser.Bloque_funcionContext;
 import compiladores.ExpRegParser.Bloque_ifContext;
 import compiladores.ExpRegParser.Bloque_instruccionesContext;
@@ -11,11 +15,15 @@ import compiladores.ExpRegParser.C_elseifContext;
 import compiladores.ExpRegParser.ComparacionContext;
 import compiladores.ExpRegParser.Comparacion_sin_parentesisContext;
 import compiladores.ExpRegParser.Declaracion_funcionContext;
+import compiladores.ExpRegParser.Declaracion_matrizContext;
+import compiladores.ExpRegParser.Declaracion_matriz_ldContext;
 import compiladores.ExpRegParser.Declaracion_y_asignacion_de_variableContext;
 import compiladores.ExpRegParser.ExpresionContext;
 import compiladores.ExpRegParser.FactorContext;
 import compiladores.ExpRegParser.InstruccionContext;
+import compiladores.ExpRegParser.Instruccion_matrizContext;
 import compiladores.ExpRegParser.InstruccionesContext;
+import compiladores.ExpRegParser.Instrucciones_del_forContext;
 import compiladores.ExpRegParser.Operadores_de_menor_ordenContext;
 import compiladores.ExpRegParser.Operadores_mayor_ordenContext;
 import compiladores.ExpRegParser.Parametros_declaracionContext;
@@ -119,6 +127,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitBloque_funcion(Bloque_funcionContext ctx) {
+        System.out.println("--------------------BLOQUE FUNCION "+"--------------------");
         String variables=visit(ctx.declaracion_funcion());
 
         System.out.println("lbl e"+this.labelEIndex);
@@ -146,6 +155,9 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     @Override
     public String visitInstruccion(InstruccionContext ctx) {
         visitAllHijos(ctx);
+        if(ctx.comparacion_sin_parentesis()!=null){
+            System.out.println("comparacion!!");
+        }
 
         return "";
     }
@@ -212,6 +224,16 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     }
 
     @Override
+    public String visitAsignacion(AsignacionContext ctx) {
+        String sentenceToReturn="";
+        
+        sentenceToReturn=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion());
+        System.out.println(sentenceToReturn);
+        
+        return sentenceToReturn;
+    }
+
+    @Override
     public String visitDeclaracion_funcion(Declaracion_funcionContext ctx) {
         //vienen las variables separados por coma por ej .. ,z,y,x
         String tempParamDec=visit(ctx.parametros_declaracion());
@@ -247,6 +269,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     //WHILE
     @Override
     public String visitBloque_while(Bloque_whileContext ctx) {
+        System.out.println("--------------------BLOQUE WHILE--------------------");
         System.out.println("lbl e"+this.labelEIndex);
         
         System.out.println(visit(ctx.comparacion()));
@@ -280,7 +303,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         sentenceToReturn+=visit(ctx.expresion(0));
         sentenceToReturn+=ctx.comparadores().getText();
         sentenceToReturn+=visit(ctx.expresion(1));
-        
         return sentenceToReturn;
     }
 
@@ -289,7 +311,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     //--bloques if
     @Override
     public String visitBloque_if(Bloque_ifContext ctx) {
-        System.out.println("-----------------------comienza if----------------");
+        System.out.println("--------------------BLOQUE IF--------------------");
         //siempre va a haber un if por lo tanto este bloque se cumple
         int bloqueInstruccionesCounter=0;
         int instruccionCounter=0;
@@ -353,7 +375,77 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         return "";
     }
 
+    //bloque for!!
+    @Override
+    public String visitBloque_for(Bloque_forContext ctx) {
+        System.out.println("--------------------BLOQUE FOR--------------------");
+        
+        visit(ctx.instruccion(0));
+        System.out.println("lbl e"+this.labelEIndex);
 
+        String tempVisitString=visit(ctx.comparacion_sin_parentesis());
+        String sentenceToReturn="t"+this.variableTempIndex+"="+tempVisitString;
+        this.variableTempIndex++;
+        System.out.println(sentenceToReturn);
+
+        System.out.println("beqz t"+(this.variableTempIndex-1)+" to e"+"<----- Va el ultimo lbl de este for!!");
+        
+        visit(ctx.bloque_instrucciones());
+        System.out.println(visit(ctx.actualizacion_del_for()));
+        System.out.println("jmp e"+this.labelEIndex);
+        this.labelEIndex++;
+        System.out.println("lbl e"+this.labelEIndex);
+
+        
+        return "";
+    }
+
+    @Override
+    public String visitActualizacion_del_for(Actualizacion_del_forContext ctx) {
+        String sentenceToReturn="";
+        sentenceToReturn=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=1+"+ctx.ID_NOMBRE_VAR_FUNC().getText();
+
+        return sentenceToReturn;
+    }
+
+    //matriz
+    @Override
+    public String visitInstruccion_matriz(Instruccion_matrizContext ctx) {
+        String sentenceToReturn="";
+        if(ctx.declaracion_matriz()!=null){
+            sentenceToReturn=visit(ctx.declaracion_matriz());
+        } else if(ctx.declaracion_matriz_ld()!=null){
+            sentenceToReturn=visit(ctx.declaracion_matriz_ld());
+        } else{
+            sentenceToReturn=visit(ctx.asignacion_matriz());
+        }
+        
+        System.out.println(sentenceToReturn);
+        return sentenceToReturn;
+    }
+
+    @Override
+    public String visitDeclaracion_matriz(Declaracion_matrizContext ctx) {
+        String stringToReturn="";
+        stringToReturn=visit(ctx.declaracion_matriz_ld());
+        return stringToReturn;
+    }
+
+    @Override
+    public String visitDeclaracion_matriz_ld(Declaracion_matriz_ldContext ctx) {
+        String sentenceToReturn="";
+        sentenceToReturn=ctx.getText();
+        return sentenceToReturn;
+    }
+
+    @Override
+    public String visitAsignacion_matriz(Asignacion_matrizContext ctx) {
+        String sentenceToReturn="";
+        sentenceToReturn+=visit(ctx.declaracion_matriz_ld());
+        sentenceToReturn+=ctx.IGUAL().getText();
+        sentenceToReturn+=visit(ctx.expresion());
+        return sentenceToReturn;
+    }
 
     //fin stefano
 
@@ -372,16 +464,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         }
         return codigoIntermedioTemp;
     }
-
-
-    
-
- 
-    /*@Override
-    public String visitInstruccion(InstruccionContext ctx) {
-        visitAllHijos(ctx);
-        return null;
-    }*/
 
 
     //--------------------------------------

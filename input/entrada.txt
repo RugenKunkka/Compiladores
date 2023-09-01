@@ -1,8 +1,10 @@
-//declaraciones simples, multiples
-//y asignaciones simpl y mult OK
-int x=0;
-if(x<2){
-    int i=0;
- } else if(x<8){
-    int o=0;
- }
+int x;
+int y;
+if(y<0){
+    j;
+    o=3;
+} else if(y<0){
+
+} else {
+
+}
