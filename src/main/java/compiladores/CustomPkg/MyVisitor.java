@@ -69,42 +69,49 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitExpresion(ExpresionContext ctx) {
+        String sentencia="";
         if(ctx.expresion()!=null && ctx.termino()!=null){
-            String sentencia="";
+            //2+5 o un f-4
             sentencia+=visit(ctx.expresion());
             sentencia+=visit(ctx.operadores_de_menor_orden());
             sentencia+=visit(ctx.termino());
-            sentencia="t"+this.variableTempIndex+"="+sentencia;
+
+            //te da eg t0=2+5
+            sentencia="t"+this.variableTempIndex+"="+sentencia+"\n";
             this.variableTempIndex++;
-            System.out.println(sentencia);
-            return ("t"+(this.variableTempIndex-1));
+            sentencia+=("t"+(this.variableTempIndex-1));
+            //System.out.println("SS !: "+sentencia);
+            //return ("t"+(this.variableTempIndex-1));
             
         }
-        if(ctx.getChildCount()==1){
-            String sentencia="";
+        else if(ctx.getChildCount()==1){
             sentencia+=visit(ctx.termino());
-            //System.out.println(sentencia);
-            return sentencia;
+            
         }
         
-        return null;
+        return sentencia;
     }
 
     @Override
     public String visitTermino(TerminoContext ctx) {
+        String sentencia="";
         if(ctx.getChildCount()==3){
-            String sentencia="";
             sentencia+=visit(ctx.termino());
             sentencia+=visit(ctx.operadores_mayor_orden());
             sentencia+=visit(ctx.factor());
-            sentencia="t"+this.variableTempIndex+"="+sentencia;
+            sentencia="t"+this.variableTempIndex+"="+sentencia+"\n";
             this.variableTempIndex++;
-            System.out.println(/*"termino: "+*/sentencia);
-            return ("t"+(this.variableTempIndex-1));
+            //System.out.println("11111");
+            //System.out.println(/*"termino: "+*/sentencia);
+            //System.out.println("22222");*/
+            sentencia+="t"+(this.variableTempIndex-1);
+            //System.out.println("t"+(this.variableTempIndex-1));
+            //return sentencia;
         } else if(ctx.getChildCount()==1 && ctx.factor()!=null){
-            return visit(ctx.factor());
+            sentencia+= visit(ctx.factor());
         }
-        return "";
+
+        return sentencia;
         
     }
 
@@ -127,39 +134,59 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitBloque_funcion(Bloque_funcionContext ctx) {
-        System.out.println("--------------------BLOQUE FUNCION "+"--------------------");
+        String bloqueFuncionToReturn="";
+        bloqueFuncionToReturn+=("--------------------BLOQUE FUNCION "+"--------------------")+"\n";
         String variables=visit(ctx.declaracion_funcion());
 
-        System.out.println("lbl e"+this.labelEIndex);
+        bloqueFuncionToReturn+="lbl e"+this.labelEIndex+"\n";
         this.labelEIndex++;
         if(variables.length()>0){
             String[] splitedVariables=variables.split(",");
             for(int i=0; i<splitedVariables.length;i++){
-                System.out.println("POP "+splitedVariables[i]);
+                bloqueFuncionToReturn+="POP "+splitedVariables[i]+"\n";
             }
         }
 
-        visit(ctx.bloque_instrucciones());
-        System.out.println("jmp <----tengo que ver a donde saltar");
+        bloqueFuncionToReturn+=visit(ctx.bloque_instrucciones());
+        bloqueFuncionToReturn+="return\n";
 
-        return "";
+        return bloqueFuncionToReturn;
     }
 
     @Override
     public String visitBloque_instrucciones(Bloque_instruccionesContext ctx) {
-        visit(ctx.instrucciones());
-
-        return "";
+        String sentencesToReturn="";
+        sentencesToReturn+=visit(ctx.instrucciones());
+        
+        return sentencesToReturn;
     }
 
     @Override
     public String visitInstruccion(InstruccionContext ctx) {
-        visitAllHijos(ctx);
-        if(ctx.comparacion_sin_parentesis()!=null){
-            System.out.println("comparacion!!");
+        String instructionToReturn="";
+        for (int hijo = 0; hijo < ctx.getChildCount(); hijo++) {
+            String stringTempVisit=visit(ctx.getChild(hijo));
+            if(stringTempVisit!=null && !stringTempVisit.contains("null")){
+                instructionToReturn+=stringTempVisit;
+            }
         }
+        //visitAllHijos(ctx);
+        
+        //System.out.println(instructionToReturn);
+        return instructionToReturn;
+    }
 
-        return "";
+    @Override
+    public String visitInstrucciones(InstruccionesContext ctx) {
+        String sentencesToReturn="";
+        for (int hijo = 0; hijo < ctx.getChildCount(); hijo++) {
+            String stringTempVisit=visit(ctx.getChild(hijo));
+            if(stringTempVisit!=null && !stringTempVisit.contains("null")){
+                sentencesToReturn+=stringTempVisit;
+            }
+        }
+        
+        return sentencesToReturn;
     }
 
     @Override
@@ -168,13 +195,11 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         if(ctx.expresion()!=null){
             returnToReturn+=visit(ctx.expresion());
         }
-        System.out.println(returnToReturn);
         return returnToReturn;
     }
 
     @Override
     public String visitDeclaracion_y_asignacion_de_variable(Declaracion_y_asignacion_de_variableContext ctx) {
-        //System.out.println("Declaracion y asignacion de una var");
         String sentenceToReturn="";
         String firstVariable=ctx.ID_NOMBRE_VAR_FUNC().getText();
         String equal= visit(ctx.asignacion_ld());
@@ -200,7 +225,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 sentenceToReturn+=variables[i]+"\n";
             }
         }
-        System.out.println( sentenceToReturn);
         return sentenceToReturn;
     }
 
@@ -228,7 +252,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         String sentenceToReturn="";
         
         sentenceToReturn=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion());
-        System.out.println(sentenceToReturn);
         
         return sentenceToReturn;
     }
@@ -269,23 +292,25 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     //WHILE
     @Override
     public String visitBloque_while(Bloque_whileContext ctx) {
-        System.out.println("--------------------BLOQUE WHILE--------------------");
-        System.out.println("lbl e"+this.labelEIndex);
+        String sentenceWhileToReturn="";
+        sentenceWhileToReturn+=("--------------------BLOQUE WHILE--------------------")+"\n";
         
-        System.out.println(visit(ctx.comparacion()));
-        System.out.println("beqz t"+(this.variableTempIndex-1)+" to e"+(this.labelEIndex+1));
+        sentenceWhileToReturn+="lbl e"+this.labelEIndex+"\n";
+        sentenceWhileToReturn+=visit(ctx.comparacion());
+        sentenceWhileToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+(this.labelEIndex+1)+"\n");
 
         if(ctx.bloque_instrucciones()!=null){
-            visit(ctx.bloque_instrucciones());
+            sentenceWhileToReturn+=visit(ctx.bloque_instrucciones());
         } else{
-            visit(ctx.instruccion());
+            sentenceWhileToReturn+=visit(ctx.instruccion());
         }
         
-        System.out.println("jpm e"+this.labelEIndex);
+        sentenceWhileToReturn+="jpm e"+this.labelEIndex+"\n";
         this.labelEIndex++;
-        System.out.println("lbl e"+this.labelEIndex);
+        sentenceWhileToReturn+="lbl e"+this.labelEIndex+"\n";
         this.labelEIndex++;
-        return "";
+        
+        return sentenceWhileToReturn;
     }
 
     @Override
@@ -303,6 +328,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         sentenceToReturn+=visit(ctx.expresion(0));
         sentenceToReturn+=ctx.comparadores().getText();
         sentenceToReturn+=visit(ctx.expresion(1));
+        sentenceToReturn+="\n";
         return sentenceToReturn;
     }
 
@@ -311,25 +337,25 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     //--bloques if
     @Override
     public String visitBloque_if(Bloque_ifContext ctx) {
-        System.out.println("--------------------BLOQUE IF--------------------");
+        String bloqueIfToReturn="";
+        bloqueIfToReturn+=("--------------------BLOQUE IF--------------------")+"\n";
         //siempre va a haber un if por lo tanto este bloque se cumple
         int bloqueInstruccionesCounter=0;
         int instruccionCounter=0;
         int comparadoresCounter=0;
 
-
-        System.out.println(visit(ctx.comparacion(comparadoresCounter)));
+        bloqueIfToReturn+=visit(ctx.comparacion(comparadoresCounter));
         comparadoresCounter++;
-        System.out.println("beqz t"+(this.variableTempIndex-1)+" to e"+this.labelEIndex);
+        bloqueIfToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+this.labelEIndex)+"\n";
         if(ctx.bloque_instrucciones(0)!=null){
-            visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
+            bloqueIfToReturn+=visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
             bloqueInstruccionesCounter++;
         } else {
-            visit(ctx.instruccion(instruccionCounter));
+            bloqueIfToReturn+=visit(ctx.instruccion(instruccionCounter));
             instruccionCounter++;
         }
-        System.out.println("jmp e"+"<--VER EL NUMERO del ultimo label del if!");
-        System.out.println("lbl e"+this.labelEIndex);
+        bloqueIfToReturn+=("jmp e"+"<--VER EL NUMERO del ultimo label del if!")+"\n";
+        bloqueIfToReturn+=("lbl e"+this.labelEIndex)+"\n";
         this.labelEIndex++;
 
 
@@ -338,12 +364,12 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         //quiere decir que existe algun else if a partir de ahora 
         int elseIfContextCounter=0;
         C_elseifContext elseIfContext=ctx.c_elseif(elseIfContextCounter);
-        System.out.println("Comienza el elseif!!!");
+        bloqueIfToReturn+=("Comienza el elseif!!!")+"\n";
         while(elseIfContext!=null){
             
-            System.out.println(visit(ctx.comparacion(comparadoresCounter)));
+            bloqueIfToReturn+=(visit(ctx.comparacion(comparadoresCounter)))+"\n";
             comparadoresCounter++;
-            System.out.println("beqz t"+(this.variableTempIndex-1)+" to e"+this.labelEIndex);
+            bloqueIfToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+this.labelEIndex)+"\n";
             if(ctx.bloque_instrucciones(0)!=null){
                 visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
                 bloqueInstruccionesCounter++;
@@ -351,13 +377,13 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 visit(ctx.instruccion(instruccionCounter));
                 instruccionCounter++;
             }
-            System.out.println("jmp e"+"<--VER EL NUMERO del ultimo label del if!");
-            System.out.println("lbl e"+this.labelEIndex);
+            bloqueIfToReturn+=("jmp e"+"<--VER EL NUMERO del ultimo label del if!")+"\n";
+            bloqueIfToReturn+=("lbl e"+this.labelEIndex)+"\n";
             this.labelEIndex++;
             elseIfContextCounter++;
             elseIfContext=ctx.c_elseif(elseIfContextCounter);
         }
-        System.out.println("Termina el elseif");
+        bloqueIfToReturn+=("Termina el elseif")+"\n";
 
         if(ctx.c_else()!=null){
             if(ctx.bloque_instrucciones(0)!=null){
@@ -369,35 +395,36 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
             }
             
         }
-        System.out.println("lbl e"+this.labelEIndex);
+        bloqueIfToReturn+=("lbl e"+this.labelEIndex)+"\n";
         this.labelEIndex++;
-        System.out.println("-----------------------termina if----------------");
-        return "";
+        bloqueIfToReturn+=("-----------------------termina if----------------")+"\n";
+        return bloqueIfToReturn;
     }
 
     //bloque for!!
     @Override
     public String visitBloque_for(Bloque_forContext ctx) {
-        System.out.println("--------------------BLOQUE FOR--------------------");
+        String bloqueForToReturn="";
+        bloqueForToReturn+=("--------------------BLOQUE FOR--------------------")+"\n";
         
-        visit(ctx.instruccion(0));
-        System.out.println("lbl e"+this.labelEIndex);
+        bloqueForToReturn+=visit(ctx.instruccion(0));
+        bloqueForToReturn+=("lbl e"+this.labelEIndex)+"\n";
 
         String tempVisitString=visit(ctx.comparacion_sin_parentesis());
         String sentenceToReturn="t"+this.variableTempIndex+"="+tempVisitString;
         this.variableTempIndex++;
-        System.out.println(sentenceToReturn);
+        bloqueForToReturn+=sentenceToReturn;//+"\n"
 
-        System.out.println("beqz t"+(this.variableTempIndex-1)+" to e"+"<----- Va el ultimo lbl de este for!!");
+        bloqueForToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+"<----- Va el ultimo lbl de este for!!")+"\n";
         
-        visit(ctx.bloque_instrucciones());
-        System.out.println(visit(ctx.actualizacion_del_for()));
-        System.out.println("jmp e"+this.labelEIndex);
+        bloqueForToReturn+=visit(ctx.bloque_instrucciones())+"\n";
+        bloqueForToReturn+=(visit(ctx.actualizacion_del_for()))+"\n";
+        bloqueForToReturn+=("jmp e"+this.labelEIndex)+"\n";
         this.labelEIndex++;
-        System.out.println("lbl e"+this.labelEIndex);
+        bloqueForToReturn+=("lbl e"+this.labelEIndex)+"\n";
 
         
-        return "";
+        return bloqueForToReturn;
     }
 
     @Override
@@ -420,7 +447,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
             sentenceToReturn=visit(ctx.asignacion_matriz());
         }
         
-        System.out.println(sentenceToReturn);
         return sentenceToReturn;
     }
 
@@ -452,8 +478,14 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitPrograma(ExpRegParser.ProgramaContext ctx) {
-        visitAllHijos(ctx);
-        return null;
+        String programa="";
+        for (int hijo = 0; hijo < ctx.getChildCount(); hijo++) {
+        
+            programa+=visit(ctx.getChild(hijo));
+        }
+        System.out.println("-----------------PROGRAMA-----------------");
+        System.out.println(programa);
+        return "";
     }
 
     //esta funcion es para poder visitar todos los hijos ya que ANTLR no lo hace!!
