@@ -1,9 +1,6 @@
 if(x<5){
     int x=3;
-    u=8000;
-} else if(y<5){
-    int y=12;
-    y=500;
-} else{
-    int U=876*8*9;
-}
+} else if(x<50){
+    int y=8;
+} else  {
+    int j=y;}

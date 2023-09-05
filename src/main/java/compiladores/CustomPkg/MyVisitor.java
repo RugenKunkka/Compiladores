@@ -74,10 +74,12 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
         //para el caso int y=0;
        if(ctx.getChildCount()==1){
+
            sentencia+=visit(ctx.termino());
-       } 
-           // para el caso int z=2+3+4;
+           
+       }   // para el caso int z=2+3+4;
        else if(ctx.getChildCount()==3){
+        
            //es recursivo??
            if(ctx.expresion().expresion()!=null){
                 sentencia+=visit(ctx.expresion());
@@ -86,42 +88,49 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 sentencia+=visit(ctx.operadores_de_menor_orden());
                 sentencia+=visit(ctx.termino())+"\n";
                 this.variableTempIndex++;
-           } else{
+           } else{//no es recursivo!!
                 //aca tengo que identificar el caso
-                if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==3){                
-                sentencia+=visit(ctx.expresion());
-                sentencia+="t"+this.variableTempIndex+"=";
-                sentencia+="t"+(this.variableTempIndex-1);
-                sentencia+=visit(ctx.operadores_de_menor_orden());
-                sentencia+=visit(ctx.termino())+"\n";
-                this.variableTempIndex++;
-                } else{
-                sentencia+="t"+this.variableTempIndex+"=";
-                sentencia+=visit(ctx.expresion());
-                sentencia+=visit(ctx.operadores_de_menor_orden());
-                sentencia+=visit(ctx.termino())+"\n";
-                this.variableTempIndex++;
-                }
-           }
-        
-          /*sentencia+=visit(ctx.expresion()); 
-            if(ctx.termino()!=null && ctx.termino().getChildCount()==3){
-                //y=4*5*5 anda genial para este caso anda muy mal para y=4+5+5;
-                sentencia+="t"+this.variableTempIndex+"=t"+this.variableTempIndex+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
-            } else {
-                sentencia+="";
-            }
+                if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==3){   
+                    sentencia+=visit(ctx.expresion());
+                    sentencia+="t"+this.variableTempIndex+"=";
+                    if(ctx.termino().getChildCount()==3){
+                        String primerT=visit(ctx.expresion()).split("=")[0];
+                        String segundoT=visit(ctx.termino()).split("=")[0];
+                        sentencia+=primerT+visit(ctx.operadores_de_menor_orden())+segundoT;
+                        sentencia+="\n";
 
-           this.variableTempIndex++;*/
+                    }else{
+                        sentencia+="t"+(this.variableTempIndex-1);
+                        sentencia+=visit(ctx.operadores_de_menor_orden());
+                        sentencia+=visit(ctx.termino())+"\n";
+                    }
+
+                    
+                    this.variableTempIndex++;
+                    
+                } else{
+
+                    if(ctx.termino()!=null && ctx.termino().termino()!=null && ctx.termino().termino().getChildCount()==1)
+                    {
+                        sentencia+=visit(ctx.termino());
+                        sentencia+="t"+this.variableTempIndex+"=";
+                        sentencia+="t"+(this.variableTempIndex-1);
+                        sentencia+=visit(ctx.operadores_de_menor_orden());
+                        sentencia+=visit(ctx.expresion());
+                        sentencia+="\n";
+                    } else {
+                        sentencia+="t"+this.variableTempIndex+"=";
+                        sentencia+=visit(ctx.expresion());
+                        sentencia+=visit(ctx.operadores_de_menor_orden());
+                        sentencia+=visit(ctx.termino());
+                        sentencia+="\n";
+                    }
+                    
+                    this.variableTempIndex++;
+                }
+           }          
+        
        } 
-       //genera el t1=t0+4 ==> del caso int z=2+3+4;
-       //else if(ctx.getChildCount()==3 && ctx.expresion().expresion()!=null){
-        //ojo aca tmb hay que ver como gfenralizamos las expresiones
-           /*sentencia+=visit(ctx.expresion());
-           sentencia+="t"+this.variableTempIndex+"="+"t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
-           this.variableTempIndex++;*/
-           
-       //}
         return sentencia;
     }
 
@@ -140,7 +149,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 sentencia+=visit(ctx.operadores_mayor_orden());
                 sentencia+=visit(ctx.factor())+"\n";
                 this.variableTempIndex++;
-                System.out.println("aaaaaaaaaaaaaaaaaaa");
                 
             } else {
                 sentencia+="t"+this.variableTempIndex+"=";
@@ -150,7 +158,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 this.variableTempIndex++;
             }
         }
-
         return sentencia;
         
     }
@@ -231,10 +238,21 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitRetorno_funcion(Retorno_funcionContext ctx) {
-        String returnToReturn="PUSH ";
-        if(ctx.expresion()!=null){
-            returnToReturn+=visit(ctx.expresion());
+        String returnToReturn="";
+        if(ctx.getChildCount()>1){
+            //para productoria sirve
+            if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==3){
+                returnToReturn+=visit(ctx.expresion());
+                returnToReturn+="PUSH t"+(this.variableTempIndex-1)+"\n";
+            }  else {
+                returnToReturn+="PUSH ";
+                returnToReturn+=visit(ctx.expresion());
+                returnToReturn+="\n";
+            }
+        } else {
+            //returnToReturn+="return \n";
         }
+        //return returnToReturn;
         return returnToReturn;
     }
 
@@ -255,12 +273,18 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 if(visitAsignacionLdResult.contains(",")){
                     String tempSentence=ctx.ID_NOMBRE_VAR_FUNC().getText()+visitAsignacionLdResult;
                     String[] splitedSentence=tempSentence.split("=");
-                    String value= splitedSentence[1];
                     String[] splitedVariables=splitedSentence[0].split(",");
-
-                    for(int i=0; i<splitedVariables.length;i++){
-                        sentenceToReturn+=splitedVariables[i]+"="+value+"\n";
+                    if(splitedSentence.length>1){
+                        String value= splitedSentence[1];
+                        for(int i=0; i<splitedVariables.length;i++){
+                            sentenceToReturn+=splitedVariables[i]+"="+value+"\n";
+                        }
+                    } else {
+                        for(int i=0; i<splitedVariables.length;i++){
+                            sentenceToReturn+=splitedVariables[i]+"\n";
+                        }
                     }
+                    
                 } else {
                     
                     if(ctx.asignacion_ld()!=null && ctx.asignacion_ld().expresion()!=null && ctx.asignacion_ld().expresion().termino().getChildCount()>1){
@@ -419,7 +443,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
             bloqueIfToReturn+=visit(ctx.instruccion(instruccionCounter));
             instruccionCounter++;
         }
-        bloqueIfToReturn+=("jmp e"+"<--VER EL NUMERO del ultimo label del if!")+"\n";
+        bloqueIfToReturn+=("jmp e"+"<--ReplaceIfLabel")+"\n";
         bloqueIfToReturn+=("lbl e"+this.labelEIndex)+"\n";
         this.labelEIndex++;
 
@@ -430,25 +454,25 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         int elseIfContextCounter=0;
         C_elseifContext elseIfContext=ctx.c_elseif(elseIfContextCounter);
         while(elseIfContext!=null){
-            bloqueIfToReturn+=("entramos al elseif!!!")+"\n";
+            //bloqueIfToReturn+=("entramos al elseif!!!")+"\n";
             bloqueIfToReturn+=(visit(ctx.comparacion(comparadoresCounter)))+"\n";
             comparadoresCounter++;
             bloqueIfToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+this.labelEIndex)+"\n";
             if(ctx.bloque_instrucciones(bloqueInstruccionesCounter)!=null){
-                bloqueIfToReturn+=("entramos al bloque!!!")+"\n";
+                //bloqueIfToReturn+=("entramos al bloque!!!")+"\n";
                 bloqueIfToReturn+=visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
                 bloqueInstruccionesCounter++;
             } else {
                 bloqueIfToReturn+=visit(ctx.instruccion(instruccionCounter));
                 instruccionCounter++;
             }
-            bloqueIfToReturn+=("jmp e"+"<--VER EL NUMERO del ultimo label del if!")+"\n";
+            bloqueIfToReturn+=("jmp e"+"<--ReplaceIfLabel")+"\n";
             bloqueIfToReturn+=("lbl e"+this.labelEIndex)+"\n";
             this.labelEIndex++;
             elseIfContextCounter++;
             elseIfContext=ctx.c_elseif(elseIfContextCounter);
         }
-        bloqueIfToReturn+=("Termina el elseif")+"\n";
+        //bloqueIfToReturn+=("Termina el elseif")+"\n";
 
         if(ctx.c_else()!=null){
             if(ctx.bloque_instrucciones(bloqueInstruccionesCounter)!=null){
@@ -458,9 +482,9 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 bloqueIfToReturn+=visit(ctx.instruccion(instruccionCounter));
                 instruccionCounter++;
             }
-            
         }
         bloqueIfToReturn+=("lbl e"+this.labelEIndex)+"\n";
+        bloqueIfToReturn=bloqueIfToReturn.replaceAll("<--ReplaceIfLabel",  Integer.toString(this.labelEIndex));
         this.labelEIndex++;
         bloqueIfToReturn+=("-----------------------termina if----------------")+"\n";
         return bloqueIfToReturn;
