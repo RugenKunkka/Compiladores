@@ -90,7 +90,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
            //System.out.println(sentencia);
            this.variableTempIndex++;
        }
-       
         return sentencia;
     }
 
@@ -100,6 +99,16 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         
         if(ctx.getChildCount()==1){
             sentencia+= visit(ctx.factor());
+        } else if(ctx.getChildCount()==3) {
+            if(ctx.termino().termino()!=null){
+                sentencia+=visit(ctx.termino());
+                sentencia+="t"+(this.variableTempIndex)+"=t"+(this.variableTempIndex-1)+visit(ctx.operadores_mayor_orden())+visit(ctx.factor())+"\n";
+                this.variableTempIndex++;
+                
+            } else {
+                sentencia+="t"+this.variableTempIndex+"="+visit(ctx.termino())+visit(ctx.operadores_mayor_orden())+visit(ctx.factor())+"\n";
+                this.variableTempIndex++;
+            }
         }
 
         return sentencia;
@@ -196,7 +205,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
         String visitAsignacionLdResult=visit(ctx.asignacion_ld());
         if(ctx.asignacion_ld().expresion()!=null && ctx.asignacion_ld().expresion().expresion()!=null){
-
             sentenceToReturn+=visitAsignacionLdResult;
             sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=t"+(this.variableTempIndex-1)+"\n";
         }
@@ -214,7 +222,14 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                         sentenceToReturn+=splitedVariables[i]+"="+value+"\n";
                     }
                 } else {
-                    sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;
+                    
+                    if(ctx.asignacion_ld()!=null && ctx.asignacion_ld().expresion()!=null && ctx.asignacion_ld().expresion().termino().getChildCount()>1){
+                        sentenceToReturn+=visitAsignacionLdResult;
+                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=t"+(this.variableTempIndex-1);
+                    } else {
+                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;
+                    }
+                    
                 }
                 
             }
@@ -254,7 +269,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         
         if(ctx.expresion().getChildCount()==3){
             sentenceToReturn+=visit(ctx.expresion());
-            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+this.variableTempIndex+"\n";
+            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
         } else {
             sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
         }
