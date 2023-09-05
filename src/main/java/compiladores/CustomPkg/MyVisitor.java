@@ -77,25 +77,51 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
            sentencia+=visit(ctx.termino());
        } 
            // para el caso int z=2+3+4;
-       else if(ctx.getChildCount()==3 &&  ctx.expresion().expresion()==null){
-           //genera el t0=2+3
-           
-           //me jode para y=2*3+4;
-           sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion())+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
+       else if(ctx.getChildCount()==3){
+           //es recursivo??
+           if(ctx.expresion().expresion()!=null){
+                sentencia+=visit(ctx.expresion());
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+="t"+(this.variableTempIndex-1);
+                sentencia+=visit(ctx.operadores_de_menor_orden());
+                sentencia+=visit(ctx.termino())+"\n";
+                this.variableTempIndex++;
+           } else{
+                //aca tengo que identificar el caso
+                if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==3){                
+                sentencia+=visit(ctx.expresion());
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+="t"+(this.variableTempIndex-1);
+                sentencia+=visit(ctx.operadores_de_menor_orden());
+                sentencia+=visit(ctx.termino())+"\n";
+                this.variableTempIndex++;
+                } else{
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+=visit(ctx.expresion());
+                sentencia+=visit(ctx.operadores_de_menor_orden());
+                sentencia+=visit(ctx.termino())+"\n";
+                this.variableTempIndex++;
+                }
+           }
+        
+          /*sentencia+=visit(ctx.expresion()); 
+            if(ctx.termino()!=null && ctx.termino().getChildCount()==3){
+                //y=4*5*5 anda genial para este caso anda muy mal para y=4+5+5;
+                sentencia+="t"+this.variableTempIndex+"=t"+this.variableTempIndex+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
+            } else {
+                sentencia+="";
+            }
 
-           //funciona con...  para y=2*3+4;
-           /*sentencia+=visit(ctx.expresion());
-           sentencia+="t"+this.variableTempIndex+"=t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";*/
-           this.variableTempIndex++;
+           this.variableTempIndex++;*/
        } 
        //genera el t1=t0+4 ==> del caso int z=2+3+4;
-       else if(ctx.getChildCount()==3 && ctx.expresion().expresion()!=null){
-        
-           sentencia+=visit(ctx.expresion());
+       //else if(ctx.getChildCount()==3 && ctx.expresion().expresion()!=null){
+        //ojo aca tmb hay que ver como gfenralizamos las expresiones
+           /*sentencia+=visit(ctx.expresion());
            sentencia+="t"+this.variableTempIndex+"="+"t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
-           this.variableTempIndex++;
+           this.variableTempIndex++;*/
            
-       }
+       //}
         return sentencia;
     }
 
@@ -106,13 +132,21 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         if(ctx.getChildCount()==1){
             sentencia+= visit(ctx.factor());
         } else if(ctx.getChildCount()==3) {
+            //es recursivo???
             if(ctx.termino().termino()!=null){
                 sentencia+=visit(ctx.termino());
-                sentencia+="t"+(this.variableTempIndex)+"=t"+(this.variableTempIndex-1)+visit(ctx.operadores_mayor_orden())+visit(ctx.factor())+"\n";
+                sentencia+="t"+(this.variableTempIndex)+"=";
+                sentencia+="t"+(this.variableTempIndex-1);
+                sentencia+=visit(ctx.operadores_mayor_orden());
+                sentencia+=visit(ctx.factor())+"\n";
                 this.variableTempIndex++;
+                System.out.println("aaaaaaaaaaaaaaaaaaa");
                 
             } else {
-                sentencia+="t"+this.variableTempIndex+"="+visit(ctx.termino())+visit(ctx.operadores_mayor_orden())+visit(ctx.factor())+"\n";
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+=visit(ctx.termino());
+                sentencia+=visit(ctx.operadores_mayor_orden());
+                sentencia+=visit(ctx.factor())+"\n";
                 this.variableTempIndex++;
             }
         }
