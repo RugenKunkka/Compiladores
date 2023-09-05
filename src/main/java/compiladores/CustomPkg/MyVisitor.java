@@ -86,10 +86,11 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
        //genera el t1=t0+4 ==> del caso int z=2+3+4;
        else if(ctx.getChildCount()==3 && ctx.expresion().expresion()!=null){
            sentencia+=visit(ctx.expresion());
-           sentencia+="t"+this.variableTempIndex+"="+"t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino());
+           sentencia+="t"+this.variableTempIndex+"="+"t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
            //System.out.println(sentencia);
            this.variableTempIndex++;
        }
+       
         return sentencia;
     }
 
@@ -251,7 +252,13 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     public String visitAsignacion(AsignacionContext ctx) {
         String sentenceToReturn="";
         
-        sentenceToReturn=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion());
+        if(ctx.expresion().getChildCount()==3){
+            sentenceToReturn+=visit(ctx.expresion());
+            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+this.variableTempIndex+"\n";
+        } else {
+            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
+        }
+        
         
         return sentenceToReturn;
     }

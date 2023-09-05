@@ -1,2 +1,0 @@
->ID:i tipoDato:11 esUsada?: true EstaInicializada?:true
-====>ID:x tipoDato:11 esUsada?: false EstaInicializada?:true
