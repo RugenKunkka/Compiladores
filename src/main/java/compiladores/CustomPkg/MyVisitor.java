@@ -270,8 +270,11 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         if(ctx.expresion().getChildCount()==3){
             sentenceToReturn+=visit(ctx.expresion());
             sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
-        } else {
+        } else if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==1){
             sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
+        } else {
+            sentenceToReturn+=visit(ctx.expresion());
+            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
         }
         
         
