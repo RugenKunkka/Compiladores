@@ -265,9 +265,9 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                     
                     if(ctx.asignacion_ld()!=null && ctx.asignacion_ld().expresion()!=null && ctx.asignacion_ld().expresion().termino().getChildCount()>1){
                         sentenceToReturn+=visitAsignacionLdResult;
-                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=t"+(this.variableTempIndex-1);
+                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=t"+(this.variableTempIndex-1)+"\n";
                     } else {
-                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;
+                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;//stefano no se si va este. lo puse por si acaso
                     }
                     
                 }
@@ -429,17 +429,17 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         //quiere decir que existe algun else if a partir de ahora 
         int elseIfContextCounter=0;
         C_elseifContext elseIfContext=ctx.c_elseif(elseIfContextCounter);
-        bloqueIfToReturn+=("Comienza el elseif!!!")+"\n";
         while(elseIfContext!=null){
-            
+            bloqueIfToReturn+=("entramos al elseif!!!")+"\n";
             bloqueIfToReturn+=(visit(ctx.comparacion(comparadoresCounter)))+"\n";
             comparadoresCounter++;
             bloqueIfToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+this.labelEIndex)+"\n";
-            if(ctx.bloque_instrucciones(0)!=null){
-                visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
+            if(ctx.bloque_instrucciones(bloqueInstruccionesCounter)!=null){
+                bloqueIfToReturn+=("entramos al bloque!!!")+"\n";
+                bloqueIfToReturn+=visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
                 bloqueInstruccionesCounter++;
             } else {
-                visit(ctx.instruccion(instruccionCounter));
+                bloqueIfToReturn+=visit(ctx.instruccion(instruccionCounter));
                 instruccionCounter++;
             }
             bloqueIfToReturn+=("jmp e"+"<--VER EL NUMERO del ultimo label del if!")+"\n";
@@ -451,11 +451,11 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         bloqueIfToReturn+=("Termina el elseif")+"\n";
 
         if(ctx.c_else()!=null){
-            if(ctx.bloque_instrucciones(0)!=null){
-                visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
+            if(ctx.bloque_instrucciones(bloqueInstruccionesCounter)!=null){
+                bloqueIfToReturn+=visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
                 bloqueInstruccionesCounter++;
             } else {
-                visit(ctx.instruccion(instruccionCounter));
+                bloqueIfToReturn+=visit(ctx.instruccion(instruccionCounter));
                 instruccionCounter++;
             }
             
