@@ -70,44 +70,34 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     @Override
     public String visitExpresion(ExpresionContext ctx) {
         String sentencia="";
-        if(ctx.expresion()!=null && ctx.termino()!=null){
-            //2+5 o un f-4
-            sentencia+=visit(ctx.expresion());
-            sentencia+=visit(ctx.operadores_de_menor_orden());
-            sentencia+=visit(ctx.termino());
-
-            //te da eg t0=2+5
-            sentencia="t"+this.variableTempIndex+"="+sentencia+"\n";
-            this.variableTempIndex++;
-            sentencia+=("t"+(this.variableTempIndex-1));
-            //System.out.println("SS !: "+sentencia);
-            //return ("t"+(this.variableTempIndex-1));
-            
-        }
-        else if(ctx.getChildCount()==1){
-            sentencia+=visit(ctx.termino());
-            
-        }
         
+
+        //para el caso int y=0;
+       if(ctx.getChildCount()==1){
+           sentencia+=visit(ctx.termino());
+       } 
+           // para el caso int z=2+3+4;
+       else if(ctx.getChildCount()==3 &&  ctx.expresion().expresion()==null){
+           //genera el t0=2+3
+           //OK!!!
+           sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion())+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
+           this.variableTempIndex++;
+       } 
+       //genera el t1=t0+4 ==> del caso int z=2+3+4;
+       else if(ctx.getChildCount()==3 && ctx.expresion().expresion()!=null){
+           sentencia+=visit(ctx.expresion());
+           sentencia+="t"+this.variableTempIndex+"="+"t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino());
+           //System.out.println(sentencia);
+           this.variableTempIndex++;
+       }
         return sentencia;
     }
 
     @Override
     public String visitTermino(TerminoContext ctx) {
         String sentencia="";
-        if(ctx.getChildCount()==3){
-            sentencia+=visit(ctx.termino());
-            sentencia+=visit(ctx.operadores_mayor_orden());
-            sentencia+=visit(ctx.factor());
-            sentencia="t"+this.variableTempIndex+"="+sentencia+"\n";
-            this.variableTempIndex++;
-            //System.out.println("11111");
-            //System.out.println(/*"termino: "+*/sentencia);
-            //System.out.println("22222");*/
-            sentencia+="t"+(this.variableTempIndex-1);
-            //System.out.println("t"+(this.variableTempIndex-1));
-            //return sentencia;
-        } else if(ctx.getChildCount()==1 && ctx.factor()!=null){
+        
+        if(ctx.getChildCount()==1){
             sentencia+= visit(ctx.factor());
         }
 
@@ -200,51 +190,61 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitDeclaracion_y_asignacion_de_variable(Declaracion_y_asignacion_de_variableContext ctx) {
+        
         String sentenceToReturn="";
-        String firstVariable=ctx.ID_NOMBRE_VAR_FUNC().getText();
-        String equal= visit(ctx.asignacion_ld());
-        //esto te da por ej x,y,u =2 ó x,y,u=3 x=3;
-        String totalDeclarationSentence=(firstVariable+equal);
-        String[] splitedTemp=totalDeclarationSentence.split("=");
-        String[] variables = splitedTemp[0].split(",");
-        String[] toAssigns=null;
-        if(splitedTemp.length>1){
-             toAssigns = splitedTemp[1].split(",");
+
+        String visitAsignacionLdResult=visit(ctx.asignacion_ld());
+        if(ctx.asignacion_ld().expresion()!=null && ctx.asignacion_ld().expresion().expresion()!=null){
+
+            sentenceToReturn+=visitAsignacionLdResult;
+            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=t"+(this.variableTempIndex-1)+"\n";
+        }
+        else{
+            if(visitAsignacionLdResult.length()==0){
+                sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+visitAsignacionLdResult+"\n";
+            } else {
+                if(visitAsignacionLdResult.contains(",")){
+                    String tempSentence=ctx.ID_NOMBRE_VAR_FUNC().getText()+visitAsignacionLdResult;
+                    String[] splitedSentence=tempSentence.split("=");
+                    String value= splitedSentence[1];
+                    String[] splitedVariables=splitedSentence[0].split(",");
+
+                    for(int i=0; i<splitedVariables.length;i++){
+                        sentenceToReturn+=splitedVariables[i]+"="+value+"\n";
+                    }
+                } else {
+                    sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;
+                }
+                
+            }
         }
         
-        if(toAssigns!=null && toAssigns.length>1){
-            for(int i=0; i<variables.length;i++){
-                sentenceToReturn+=variables[i]+"="+toAssigns[i]+"\n";
-            }
-        } else if(toAssigns!=null) {
-            for(int i=0; i<variables.length;i++){
-                sentenceToReturn+=variables[i]+"="+toAssigns[0]+"\n";
-            }
-        } else {
-            for(int i=0; i<variables.length;i++){
-                sentenceToReturn+=variables[i]+"\n";
-            }
-        }
+        
+        
         return sentenceToReturn;
     }
 
     @Override
     public String visitAsignacion_ld(Asignacion_ldContext ctx) {
-        String assiggsToReturn="";
-        if(ctx.expresion()!=null){
-            assiggsToReturn+="="+visit(ctx.expresion());
-            assiggsToReturn+=visit(ctx.asignacion_ld());
-        }
-        else if(ctx.COMA()!=null && ctx.expresion()==null){
-            assiggsToReturn+=ctx.COMA().getText();
-            if(ctx.ID_NOMBRE_VAR_FUNC()!=null){
-                assiggsToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText();
-            } else if(ctx.NUMERO()!=null){
-                assiggsToReturn+=ctx.NUMERO().getText();
+        String assiggnsToReturn="";
+       
+        if(ctx.getChildCount()==3){
+            if(ctx.expresion()!=null){
+                assiggnsToReturn+=visit(ctx.expresion())+"\n";
+            } else if(ctx.COMA()!=null){
+                assiggnsToReturn+=ctx.getText();
+                /*/
+                if(ctx.asignacion_ld().asignacion_ld()!=null){
+                    assiggnsToReturn+=visit(ctx.asignacion_ld());
+                    System.out.println( ctx.getText());
+                } else {
+                    assiggnsToReturn+="";
+                }*/
             }
-            assiggsToReturn+=visit(ctx.asignacion_ld());
+            
         }
-        return assiggsToReturn;
+
+        return assiggnsToReturn;
     }
 
     @Override
