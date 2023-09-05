@@ -1,3 +1,0 @@
-====>ID:x tipoDato:11 esUsada?: false EstaInicializada?:true
-====>ID:y tipoDato:11 esUsada?: false EstaInicializada?:true
-====>ID:j tipoDato:11 esUsada?: false EstaInicializada?:true

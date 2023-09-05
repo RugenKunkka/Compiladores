@@ -24,9 +24,11 @@ import compiladores.ExpRegParser.InstruccionContext;
 import compiladores.ExpRegParser.Instruccion_matrizContext;
 import compiladores.ExpRegParser.InstruccionesContext;
 import compiladores.ExpRegParser.Instrucciones_del_forContext;
+import compiladores.ExpRegParser.Llamada_funcionContext;
 import compiladores.ExpRegParser.Operadores_de_menor_ordenContext;
 import compiladores.ExpRegParser.Operadores_mayor_ordenContext;
 import compiladores.ExpRegParser.Parametros_declaracionContext;
+import compiladores.ExpRegParser.Parametros_para_llamadaContext;
 import compiladores.ExpRegParser.ProgramaContext;
 import compiladores.ExpRegParser.Retorno_funcionContext;
 import compiladores.ExpRegParser.TerminoContext;
@@ -504,13 +506,14 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         this.variableTempIndex++;
         bloqueForToReturn+=sentenceToReturn;//+"\n"
 
-        bloqueForToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+"<----- Va el ultimo lbl de este for!!")+"\n";
+        bloqueForToReturn+=("beqz t"+(this.variableTempIndex-1)+" to e"+"<-----ReplaceForLabel")+"\n";
         
         bloqueForToReturn+=visit(ctx.bloque_instrucciones())+"\n";
         bloqueForToReturn+=(visit(ctx.actualizacion_del_for()))+"\n";
         bloqueForToReturn+=("jmp e"+this.labelEIndex)+"\n";
         this.labelEIndex++;
         bloqueForToReturn+=("lbl e"+this.labelEIndex)+"\n";
+        bloqueForToReturn=bloqueForToReturn.replace("<-----ReplaceForLabel", Integer.toString(this.labelEIndex));
 
         
         return bloqueForToReturn;
@@ -559,6 +562,34 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         sentenceToReturn+=visit(ctx.declaracion_matriz_ld());
         sentenceToReturn+=ctx.IGUAL().getText();
         sentenceToReturn+=visit(ctx.expresion());
+        return sentenceToReturn;
+    }
+
+    //llamadas a funcion 
+    @Override
+    public String visitParametros_para_llamada(Parametros_para_llamadaContext ctx) {
+        String sentenceToReturn="";
+        if(ctx.getChildCount()==1){
+            sentenceToReturn+="PUSH "+visit(ctx.expresion());
+            sentenceToReturn+="\n";
+        } else {
+            sentenceToReturn+=visit(ctx.parametros_para_llamada());
+            sentenceToReturn+="PUSH "+visit(ctx.expresion());
+            sentenceToReturn+="\n";
+        }
+        
+        return sentenceToReturn;
+    }
+
+    @Override
+    public String visitLlamada_funcion(Llamada_funcionContext ctx) {
+        String sentenceToReturn="";
+
+        sentenceToReturn+=visit(ctx.parametros_para_llamada());
+        sentenceToReturn+="call "+ctx.ID_NOMBRE_VAR_FUNC().getText()+"\n";
+        //si tiene dato para devolver???
+        sentenceToReturn+="POP "+"\n";
+
         return sentenceToReturn;
     }
 
