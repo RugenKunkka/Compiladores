@@ -79,16 +79,22 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
            // para el caso int z=2+3+4;
        else if(ctx.getChildCount()==3 &&  ctx.expresion().expresion()==null){
            //genera el t0=2+3
-           //OK!!!
+           
+           //me jode para y=2*3+4;
            sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion())+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
+
+           //funciona con...  para y=2*3+4;
+           /*sentencia+=visit(ctx.expresion());
+           sentencia+="t"+this.variableTempIndex+"=t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";*/
            this.variableTempIndex++;
        } 
        //genera el t1=t0+4 ==> del caso int z=2+3+4;
        else if(ctx.getChildCount()==3 && ctx.expresion().expresion()!=null){
+        
            sentencia+=visit(ctx.expresion());
            sentencia+="t"+this.variableTempIndex+"="+"t"+(this.variableTempIndex-1)+visit(ctx.operadores_de_menor_orden())+visit(ctx.termino())+"\n";
-           //System.out.println(sentencia);
            this.variableTempIndex++;
+           
        }
         return sentencia;
     }
