@@ -75,10 +75,21 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         
         
         //para el caso int y=0;
-       if(ctx.getChildCount()==1 && ctx.getParent().getChild(2).getChildCount()==1){
+        if(ctx.getChildCount()==3 && ctx.termino().getChildCount()==1
+            && ctx.termino().factor()!=null && ctx.termino().factor().getChildCount()==3
+            && ctx.expresion().getChildCount()==1 && ctx.expresion().termino().getChildCount()==1
+        ){
+            sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion())+'\n';
+            this.variableTempIndex++;
+            sentencia+=visit(ctx.termino());
+            sentencia+="t"+this.variableTempIndex+"=t"+(this.variableTempIndex-1)+ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-2)+'\n';
+            this.variableTempIndex++;
+        }
+       else if(ctx.getChildCount()==1 && ctx.getParent().getChild(2).getChildCount()==1){
             //seria por ejemplo b*b o 2*2 con su respectivo t
             //ej b*b*b t0=b*b t1=t0*b 
            sentencia+=visit(ctx.termino());
+           
            
        }   // para el caso int z=2+3+4;
        else if (ctx.getChildCount()==1){
@@ -237,14 +248,31 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         String sentencia="";
         
         //si tiene un único hijo devolves el valor del factor
-        if(ctx.getChildCount()==1){
+        if(ctx.getChildCount()==1 && ctx.factor()!=null
+        &&
+        ctx.factor().getChildCount()==3
+        ){
+            return visit(ctx.factor());
+        }
+        else if(ctx.getChildCount()==1){
             sentencia+= visit(ctx.factor());
         } else if(ctx.getChildCount()==3) {
             //es recursivo???
             //si tiene 3 hijos tenemos varios casos
             //caso donde solo termino tiene termino d ehijo pero ese termino no tiene otro hijo de termino
+            if( ctx.getChildCount()==3 &&
+                ctx.termino()!=null && ctx.termino().termino()==null && 
+            ctx.factor()!=null && ctx.factor().getChildCount()==3){
+                sentencia+="t"+this.variableTempIndex+"="+visit(ctx.termino());
+                sentencia+="\n";
+                this.variableTempIndex++;
+                sentencia+=visit(ctx.factor());
 
-            if(ctx.termino()!=null && ctx.termino().termino()==null){
+                sentencia+="t"+this.variableTempIndex+"=t"+(this.variableTempIndex-1)+ctx.operadores_mayor_orden().getText()+"t"+(this.variableTempIndex-2);
+                sentencia+="\n";
+
+            }
+            else if(ctx.termino()!=null && ctx.termino().termino()==null){
                 sentencia+="t"+this.variableTempIndex+"=";
                 sentencia+=visit(ctx.termino());
                 sentencia+=visit(ctx.operadores_mayor_orden());
@@ -261,22 +289,6 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 sentencia+=visit(ctx.factor())+"\n";
                 this.variableTempIndex++;
             }
-            /* 
-            if(ctx.termino().termino()!=null){
-                sentencia+=visit(ctx.termino());
-                sentencia+="t"+(this.variableTempIndex)+"=";
-                sentencia+="t"+(this.variableTempIndex-1);
-                sentencia+=visit(ctx.operadores_mayor_orden());
-                sentencia+=visit(ctx.factor())+"\n";
-                this.variableTempIndex++;
-                
-            } else {
-                sentencia+="t"+this.variableTempIndex+"=";
-                sentencia+=visit(ctx.termino());
-                sentencia+=visit(ctx.operadores_mayor_orden());
-                sentencia+=visit(ctx.factor())+"\n";
-                this.variableTempIndex++;
-            }*/
         }
         return sentencia;
         
@@ -458,10 +470,24 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     public String visitAsignacion(AsignacionContext ctx) {
         String sentenceToReturn="";
         
-        if(ctx.expresion().getChildCount()==3){
+        /*if(ctx.expresion().getChildCount()==3 &&
+        ctx.expresion().termino().getChildCount()==1 && ctx.expresion().termino().factor()!=null &&
+        ctx.expresion().termino().factor().getChildCount()==3
+        ){
+            sentenceToReturn+=visit(ctx.expresion());
+            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n"
+        }
+        else */if(ctx.expresion().getChildCount()==3){
             sentenceToReturn+=visit(ctx.expresion());
             sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
         } else if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==1){
+            /*if(ctx.expresion().termino().factor()!=null && 
+            ctx.expresion().termino().factor().getChildCount()==3
+            ){
+                sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
+            } else {
+                sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
+            }*/
             sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
         } else {
             sentenceToReturn+=visit(ctx.expresion());
