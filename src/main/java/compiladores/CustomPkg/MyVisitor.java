@@ -73,24 +73,65 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     public String visitExpresion(ExpresionContext ctx) {
         String sentencia="";
         
-
+        
         //para el caso int y=0;
-       if(ctx.getChildCount()==1){
+       if(ctx.getChildCount()==1 && ctx.getParent().getChild(2).getChildCount()==1){
             //seria por ejemplo b*b o 2*2 con su respectivo t
             //ej b*b*b t0=b*b t1=t0*b 
            sentencia+=visit(ctx.termino());
            
        }   // para el caso int z=2+3+4;
+       else if (ctx.getChildCount()==1){
+            
+            sentencia+="t"+this.variableTempIndex+"="+visit(ctx.termino())+"\n";
+            this.variableTempIndex++;
+       }
        else if(ctx.getChildCount()==3){
             //analizando LOS izquierdoS, si es unico listo.. con esto terminas
 //esto anda en el caso de que el lado izquierdo sea un * o /
-            if(ctx.expresion().getChildCount()==1 && ctx.termino().getChildCount()==1){
-                 sentencia+="t"+this.variableTempIndex+"=";
+            /*if(ctx.expresion().getChildCount()==1 && ctx.termino().getChildCount()==3){
+                sentencia+="t"+this.variableTempIndex+"=";
                 sentencia+=visit(ctx.expresion());
-                sentencia+=ctx.operadores_de_menor_orden().getText();
-                sentencia+=visit(ctx.termino());
+                //sentencia+=ctx.operadores_de_menor_orden().getText();
+                //sentencia+=visit(ctx.termino());
+                
                 sentencia+="\n";
                 this.variableTempIndex++;
+            }*/
+            /*
+            if(
+            ctx.expresion().getChildCount()==1 &&
+            ctx.expresion().termino()!=null && ctx.expresion().termino().getChildCount()==3
+            &&
+            ctx.termino().getChildCount()==1 &&
+            ctx.termino().factor().getChildCount()==1
+            
+            ){
+                //sentencia+="aaa";
+            }*/
+            //x1=b*a+2 rompe en +2
+            if(ctx.expresion().getChildCount()==1 && ctx.termino().getChildCount()==1){
+                if(ctx.expresion().termino()!=null && ctx.expresion().termino().getChildCount()==3
+                 && ctx.termino().factor()!=null
+                ){
+                    sentencia+=visit(ctx.expresion());
+                    sentencia+="t"+this.variableTempIndex+"=";
+                    if(ctx.operadores_de_menor_orden().getText().equals("+")){
+                        sentencia+=visit(ctx.termino());
+                    } else {
+                        sentencia+=ctx.operadores_de_menor_orden().getText()+visit(ctx.termino());    
+                    }
+                    sentencia+="\n";
+                    this.variableTempIndex++;
+                } else 
+                {
+                    sentencia+="t"+this.variableTempIndex+"=";
+                    sentencia+=visit(ctx.expresion());
+                    sentencia+=ctx.operadores_de_menor_orden().getText();
+                    sentencia+=visit(ctx.termino());
+                    sentencia+="\n";
+                    this.variableTempIndex++;
+                }
             }
             else if(ctx.expresion().expresion()!=null){
                 //System.out.println("VIENDOOO2222!!! "+ctx.getText());
