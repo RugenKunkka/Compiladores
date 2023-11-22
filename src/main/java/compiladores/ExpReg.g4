@@ -28,11 +28,13 @@ COMA:',';
 MENOR:'<';
 MAYOR:'>';
 SA:'!';
+PUNTO:'.';
 
 CA:'[';
 CC:']';
 
 NUMERO : DIGITO+;
+NUMERO_DECIMAL : NUMERO PUNTO NUMERO;
 
 //operadores
 MAS:'+';
@@ -103,6 +105,7 @@ termino: termino operadores_mayor_orden factor
 factor: PA expresion PC
       | ID_NOMBRE_VAR_FUNC
       | NUMERO
+      | NUMERO_DECIMAL
       | declaracion_matriz_ld
       ;
 
@@ -138,6 +141,7 @@ asignacion: ID_NOMBRE_VAR_FUNC IGUAL expresion
 asignacion_ld: IGUAL expresion asignacion_ld
            | COMA ID_NOMBRE_VAR_FUNC asignacion_ld
            | COMA NUMERO asignacion_ld
+           | COMA NUMERO_DECIMAL asignacion_ld
            | IGUAL operacion
            |;
 

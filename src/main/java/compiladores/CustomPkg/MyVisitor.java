@@ -76,13 +76,66 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
         //para el caso int y=0;
        if(ctx.getChildCount()==1){
-
+            //seria por ejemplo b*b o 2*2 con su respectivo t
+            //ej b*b*b t0=b*b t1=t0*b 
            sentencia+=visit(ctx.termino());
            
        }   // para el caso int z=2+3+4;
        else if(ctx.getChildCount()==3){
-        
+            //analizando LOS izquierdoS, si es unico listo.. con esto terminas
+//esto anda en el caso de que el lado izquierdo sea un * o /
+            if(ctx.expresion().getChildCount()==1 && ctx.termino().getChildCount()==1){
+                 sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+=visit(ctx.expresion());
+                sentencia+=ctx.operadores_de_menor_orden().getText();
+                sentencia+=visit(ctx.termino());
+                sentencia+="\n";
+                this.variableTempIndex++;
+            }
+            else if(ctx.expresion().expresion()!=null){
+                //System.out.println("VIENDOOO2222!!! "+ctx.getText());
+                sentencia+=visit(ctx.expresion());
+                int tempIndexIzquierda=this.variableTempIndex-1;
+                if(ctx.termino().getChildCount()==1){
+                    sentencia+="t"+this.variableTempIndex+"=";
+                    sentencia+="t"+(this.variableTempIndex-1);
+                    sentencia+=visit(ctx.operadores_de_menor_orden());
+                    sentencia+=visit(ctx.termino())+"\n";
+                    this.variableTempIndex++;
+                } else if(ctx.termino().getChildCount()==3){
+                    sentencia+=visit(ctx.termino());
+                    sentencia+="t"+this.variableTempIndex+"=t"+tempIndexIzquierda+ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1)+"\n";
+                    this.variableTempIndex++;
+                }
+                
+            }
+            else if(ctx.expresion().termino()!=null /*&& ctx.termino().getChildCount()!=3*/){//esto se ejecuta con child 3 o 1
+                //System.out.println("VIENDOOO!!! "+ctx.getText());
+                if(ctx.termino().getChildCount()==3){
+                    sentencia+=visit(ctx.expresion());
+                    int tempIndexLadoIzquierdo=this.variableTempIndex-1;
+                    sentencia+=visit(ctx.termino())+"\n";
+                    sentencia+="t"+this.variableTempIndex+"="+"t"+tempIndexLadoIzquierdo+ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1)+"\n";
+                    this.variableTempIndex++;
+                } else {
+                    sentencia+=visit(ctx.expresion());
+                    sentencia+="t"+this.variableTempIndex+"=";
+                    sentencia+="t"+(this.variableTempIndex-1);
+                    sentencia+=visit(ctx.operadores_de_menor_orden());
+                    sentencia+=visit(ctx.termino())+"\n";
+                    this.variableTempIndex++;
+                }
+                
+            } 
+
+            //analizas los derechos
+            if(ctx.termino()!=null){
+
+
+            }
+
            //es recursivo??
+           /*
            if(ctx.expresion().expresion()!=null){
                 sentencia+=visit(ctx.expresion());
                 sentencia+="t"+this.variableTempIndex+"=";
@@ -130,7 +183,8 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                     
                     this.variableTempIndex++;
                 }
-           }          
+           }     
+            */     
         
        } 
         return sentencia;
@@ -138,12 +192,35 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitTermino(TerminoContext ctx) {
+        //System.out.println("AAAAAAAAAAAAA "+ctx.getText() );
         String sentencia="";
         
+        //si tiene un único hijo devolves el valor del factor
         if(ctx.getChildCount()==1){
             sentencia+= visit(ctx.factor());
         } else if(ctx.getChildCount()==3) {
             //es recursivo???
+            //si tiene 3 hijos tenemos varios casos
+            //caso donde solo termino tiene termino d ehijo pero ese termino no tiene otro hijo de termino
+
+            if(ctx.termino()!=null && ctx.termino().termino()==null){
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+=visit(ctx.termino());
+                sentencia+=visit(ctx.operadores_mayor_orden());
+                sentencia+=visit(ctx.factor())+"\n";
+                //System.out.println("QUILOMBO: "+ sentencia);
+                this.variableTempIndex++;
+            } //si tiene 3 niveles de termino.. va el t en el medio
+            else if(ctx.termino()!=null && ctx.termino().termino()!=null){
+                //System.out.println("tengo un quilombo: "+ ctx.termino().getText());
+                sentencia+=visit(ctx.termino());
+                sentencia+="t"+(this.variableTempIndex)+"=";
+                sentencia+="t"+(this.variableTempIndex-1);
+                sentencia+=visit(ctx.operadores_mayor_orden());
+                sentencia+=visit(ctx.factor())+"\n";
+                this.variableTempIndex++;
+            }
+            /* 
             if(ctx.termino().termino()!=null){
                 sentencia+=visit(ctx.termino());
                 sentencia+="t"+(this.variableTempIndex)+"=";
@@ -158,7 +235,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 sentencia+=visit(ctx.operadores_mayor_orden());
                 sentencia+=visit(ctx.factor())+"\n";
                 this.variableTempIndex++;
-            }
+            }*/
         }
         return sentencia;
         
@@ -166,6 +243,13 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
     @Override
     public String visitFactor(FactorContext ctx) {
+        
+        if(ctx.getChildCount()==3){//sabés que tiene un Paréntesis que abre y otro que cierra
+            if(ctx.expresion()!=null){
+                //System.out.println("aaaaa: "+visit(ctx.expresion()));
+                return visit(ctx.expresion());
+            }
+        }
         return ctx.getText();
     }
     @Override

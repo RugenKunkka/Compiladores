@@ -44,7 +44,6 @@ public class Escucha extends ExpRegBaseListener{
     public void exitDeclaracion_matriz(Declaracion_matrizContext ctx) {
         Variable tempVariable = new Variable(ctx.declaracion_matriz_ld().ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
         this.tablaSimbolos.agregarId(tempVariable);
-
     }
 
     @Override
@@ -99,9 +98,8 @@ public class Escucha extends ExpRegBaseListener{
         RuleContext parentContext = ctx.getParent();
         if(parentContext instanceof Declaracion_funcionContext){
             Declaracion_funcionContext declaracionFuncionContext = (Declaracion_funcionContext) parentContext;
-            Funcion funcion = new Funcion(declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getText(), declaracionFuncionContext.tipo_variable().getStart().getType());
+            Funcion funcion = new Funcion(declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getText(), declaracionFuncionContext.tipo_variable().getStart().getType());//obtengo el nombre de la funcion y el tipo de valor que va a retornar la funcion XD 
             Token idToken = declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getSymbol();
-            String idTexto = idToken.getText();
             //system.out.println("EL PADRE ES!!!:"+ funcion.toString());
             this.tablaSimbolos.agregarId(funcion);
         }
@@ -207,7 +205,7 @@ public class Escucha extends ExpRegBaseListener{
             }
         }
     }
-
+//detecto si estoy llamando de manera incorrecta la funcion (parametros de mas o de menos)
     @Override
     public void exitLlamada_funcion(Llamada_funcionContext ctx) {
         String nombreFuncion=ctx.ID_NOMBRE_VAR_FUNC().getText();
@@ -215,6 +213,7 @@ public class Escucha extends ExpRegBaseListener{
         if(funcionEncontrada==null){
             System.out.println("No se encuentra declarada la funcion "+ctx.getText());
         } else {
+            funcionEncontrada.setUsada(true);
             if(this.bufferTempParametrosParaLlamada>funcionEncontrada.getArgumentos().size()){
                 System.out.println("Se está llamando a la funcion <-- "+funcionEncontrada.getID()+" --> con parámetros de más");
             } else if(this.bufferTempParametrosParaLlamada<funcionEncontrada.getArgumentos().size()){
@@ -222,7 +221,6 @@ public class Escucha extends ExpRegBaseListener{
             }
         }
         this.bufferTempParametrosParaLlamada=0;
-
     }
 
     @Override
