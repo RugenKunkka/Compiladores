@@ -102,12 +102,13 @@ termino: termino operadores_mayor_orden factor
        | factor
        ;
 
-factor: PA expresion PC
+factor: factor_con_parentesis
       | ID_NOMBRE_VAR_FUNC
       | NUMERO
       | NUMERO_DECIMAL
       | declaracion_matriz_ld
       ;
+factor_con_parentesis:PA expresion PC;
 
 //ciclos y condicionales
 //la C es de custom
