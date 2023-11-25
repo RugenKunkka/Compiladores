@@ -37,6 +37,7 @@ import compiladores.ExpRegParser.Variable_o_parametro_aisladaContext;
 
 import java.util.ArrayList;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -87,40 +88,111 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
            if(ctx.expresion()!=null && ctx.expresion().expresion()==null){
                 //si termino es recursivo!!
                 if(ctx.termino().termino()!=null){
-                    //sentencia+="tcc"+this.variableTempIndex+"=";
-                    int indiceTemp=this.variableTempIndex;
-                    //te fijas si no es recursivo
-                    if(ctx.expresion().expresion()==null){
-                        //te fijas si es un producto o no
-                        if(ctx.expresion().getChildCount()==1){
-                            sentencia+=visit(ctx.expresion());
-                            indiceTemp=this.variableTempIndex-1;
-                        } else{
-                            sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion());
-                            sentencia+="\n";
-                            this.variableTempIndex++;
+                    if(ctx.termino().termino().factor().factor_con_parentesis()!=null &&
+                    ctx.expresion()!=null && ctx.expresion().getChildCount()==1 &&
+                    ctx.expresion().termino().getChildCount()==1){
+                        int indiceTemp=this.variableTempIndex;
+                        //te fijas si no es recursivo
+                        if(ctx.expresion().expresion()==null){
+                            //te fijas si es un producto o no
+                            if(ctx.expresion().getChildCount()==1){
+                                indiceTemp=this.variableTempIndex;
+                                sentencia+="t"+this.variableTempIndex+"=";
+                                this.variableTempIndex++;
+                                sentencia+=visit(ctx.expresion());
+                            } else{
+                                sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion());
+                                sentencia+="\n";
+                                this.variableTempIndex++;
+                            }
+                            
                         }
+                        sentencia+=visit(ctx.termino());
+                        //sentencia+="\n";
+                        //t3=t0+t2
+                        //this.variableTempIndex++;
+                        sentencia+="t"+this.variableTempIndex+"=";
+                        sentencia+="t"+indiceTemp+ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1);
+                        //sentencia+="t"+this.variableTempIndex+"=t"+indiceTemp;
+                        //sentencia+=ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1);
+                        sentencia+="\n";
+                    } else {
+                        int indiceTemp=this.variableTempIndex;
+                        //te fijas si no es recursivo
+                        if(ctx.expresion().expresion()==null){
+                            //te fijas si es un producto o no
+                            if(ctx.expresion().getChildCount()==1){
+                                sentencia+=visit(ctx.expresion());
+                                indiceTemp=this.variableTempIndex-1;
+                            } else{
+                                sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion());
+                                sentencia+="\n";
+                                this.variableTempIndex++;
+                            }
+                            
+                        }
+                        sentencia+=visit(ctx.termino());
+                        //sentencia+="\n";
                         
+                        sentencia+="t"+this.variableTempIndex+"=t"+indiceTemp;
+                        sentencia+=ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1);
+                        //sentencia+="t";
+                        sentencia+="\n";
                     }
-                    sentencia+=visit(ctx.termino());
-                    //sentencia+="\n";
-                    
-                    sentencia+="t"+this.variableTempIndex+"=t"+indiceTemp;
-                    sentencia+=ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1);
-                    //sentencia+="t";
-                    sentencia+="\n";
                 } else {
                     //si esta solo el termino
                     //si es producto..
                     if(ctx.expresion().expresion()==null && ctx.expresion().termino()!=null && ctx.expresion().termino().operadores_mayor_orden()!=null){
-                        
-                        sentencia+=visit(ctx.expresion());
-                        sentencia+="t"+this.variableTempIndex+"=";
-                        sentencia+=ctx.operadores_de_menor_orden().getText()+visit(ctx.termino())+"\n";
+                        //tengo que ver si el lazo izquierdo esta solo o no 
+                        //si no está solo... 
+                        if(ctx.expresion().termino().getChildCount()==3){
+                            
+                            sentencia+=visit(ctx.expresion());
+                            int indexTemp=this.variableTempIndex-1;
+                            sentencia+="t"+this.variableTempIndex+"=";
+                            sentencia+="t"+indexTemp;
+                            sentencia+=ctx.operadores_de_menor_orden().getText()+visit(ctx.termino())+"\n";
+
+                        }
+                        else {
+                            sentencia+=visit(ctx.expresion());
+                            sentencia+="t"+this.variableTempIndex+"=";
+                            sentencia+=ctx.operadores_de_menor_orden().getText()+visit(ctx.termino())+"\n";
+                        }
                     } else {
-                        sentencia+="t"+this.variableTempIndex+"=";
-                        sentencia+=visit(ctx.expresion())+ctx.operadores_de_menor_orden().getText();
-                        sentencia+=visit(ctx.termino())+"\n";
+                        ParserRuleContext parentExpresion=ctx.getParent();
+                        //en caso de que exista un parentesis ==> 2+(3*4)
+                        if(ctx.termino().factor().factor_con_parentesis()!=null){
+                            int tempIndex=this.variableTempIndex;
+                            sentencia+="t"+this.variableTempIndex+"=";
+                            sentencia+=visit(ctx.expresion())+"\n";
+                            this.variableTempIndex++;
+                            sentencia+=visit(ctx.termino());
+                            sentencia+="t"+this.variableTempIndex+"=";
+                            sentencia+="t"+ tempIndex+ctx.operadores_de_menor_orden().getText() +"t"+(this.variableTempIndex-1);
+                            
+                            sentencia+="\n";
+
+                            //sentencia+=
+                            //sentencia+=ctx.operadores_de_menor_orden().getText();
+                        } else if(parentExpresion instanceof ExpresionContext && ((ExpresionContext)parentExpresion).termino().factor().factor_con_parentesis()!=null){
+                            //x=2+2+(b+c);
+                            System.out.println("aaaa==> "+ctx.getText());
+                            sentencia+="t"+this.variableTempIndex+"=";
+                            sentencia+=visit(ctx.expresion());
+                            sentencia+=visit(ctx.operadores_de_menor_orden());
+                            sentencia+=visit(ctx.termino());
+                            sentencia+="\n";
+                        }
+                        else {
+                            System.out.println("bbbb==> "+ctx.getText());
+                            //stefanoooo
+                            sentencia+="t"+this.variableTempIndex+"=";
+                            sentencia+=visit(ctx.expresion())+ctx.operadores_de_menor_orden().getText();
+                            sentencia+=visit(ctx.termino());
+                            sentencia+="\n";
+                        }
+                        
                     }
                     
                 }
@@ -136,6 +208,22 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                     sentencia+=visit(ctx.termino());
                     sentencia+="t"+this.variableTempIndex+"=";
                     sentencia+="t"+indexTemp+ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1);
+                    sentencia+="\n";
+                    this.variableTempIndex++;
+                }
+                else if(ctx.expresion()!=null && ctx.expresion().getChildCount()==3
+                && ctx.termino().factor().factor_con_parentesis()!=null &&
+                ctx.termino().factor().factor_con_parentesis().expresion().getChildCount()==3
+                ){
+                    
+                    sentencia+=visit(ctx.expresion());
+                    int tempIndex=this.variableTempIndex-1;
+                    sentencia+=visit(ctx.termino());
+
+                    sentencia+="t"+this.variableTempIndex+"=";
+                    sentencia+="t"+tempIndex;
+                    sentencia+=ctx.operadores_de_menor_orden().getText();
+                    sentencia+="t"+(this.variableTempIndex-1);
                     sentencia+="\n";
                     this.variableTempIndex++;
                 }
@@ -169,8 +257,48 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                 sentencia+=visit(ctx.operadores_mayor_orden());
                 sentencia+=visit(ctx.factor())+"\n";
                 this.variableTempIndex++;
-                
-            } else {
+                //falta poner en el else if si no hay recursividad de lado izquierdo
+            } else if(ctx.getChildCount()==3 && ctx.factor().factor_con_parentesis()!=null
+            ){
+                //t0=2 ok
+                sentencia+="\n";
+                sentencia+=visit(ctx.factor());
+
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+=visit(ctx.termino());
+                sentencia+=visit(ctx.operadores_mayor_orden());
+                sentencia+="t"+(this.variableTempIndex-1);
+                sentencia+="\n";
+                sentencia+="\n";
+                this.variableTempIndex++;
+            }
+            else if(ctx.factor().factor_con_parentesis()!=null){
+                //System.out.println("aaa:"+ctx.getText());
+                sentencia+="t"+this.variableTempIndex+"=";
+                this.variableTempIndex++;
+                sentencia+=visit(ctx.termino());
+                int tempIndex=this.variableTempIndex-1;
+                sentencia+="\n";
+                //sentencia+=visit(ctx.operadores_mayor_orden());
+                sentencia+=visit(ctx.factor());
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+="t"+tempIndex+ctx.operadores_mayor_orden().getText()+"t"+(this.variableTempIndex-1);
+                sentencia+="\n";
+                this.variableTempIndex++;
+            }
+            //caso x=2+(b+c)*3;
+            else if(ctx.termino().factor().factor_con_parentesis()!=null){
+                sentencia+="\n";
+                sentencia+=visit(ctx.termino());
+                //OJO con las sumas y restas al tempIndex
+                /*sentencia+="t"+(this.variableTempIndex+1)+"=";
+                sentencia+="t"+this.variableTempIndex+ctx.operadores_mayor_orden().getText()+visit(ctx.factor())+"\n";*/
+                sentencia+="t"+(this.variableTempIndex)+"=";
+                sentencia+="t"+(this.variableTempIndex-1)+ctx.operadores_mayor_orden().getText()+visit(ctx.factor())+"\n";
+                this.variableTempIndex++;
+
+            }
+            else {
                 sentencia+="t"+this.variableTempIndex+"=";
                 sentencia+=visit(ctx.termino());
                 sentencia+=visit(ctx.operadores_mayor_orden());
@@ -317,7 +445,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                         sentenceToReturn+=visitAsignacionLdResult;
                         sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=t"+(this.variableTempIndex-1)+"\n";
                     } else {
-                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;//stefano no se si va este. lo puse por si acaso
+                        sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;//no se si va este. lo puse por si acaso
                     }
                     
                 }
@@ -617,9 +745,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
 
         return sentenceToReturn;
     }
-
-    //fin stefano
-
+//finnn
 
     @Override
     public String visitPrograma(ExpRegParser.ProgramaContext ctx) {
