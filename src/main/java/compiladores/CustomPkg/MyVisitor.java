@@ -116,7 +116,25 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                         //sentencia+="t"+this.variableTempIndex+"=t"+indiceTemp;
                         //sentencia+=ctx.operadores_de_menor_orden().getText()+"t"+(this.variableTempIndex-1);
                         sentencia+="\n";
-                    } else {
+                    } 
+                    //x=2+2*3; es para cachar este caso
+                    else if(ctx.expresion().getChildCount()==1 &&
+                        ctx.expresion().termino().getChildCount()==1 &&
+                        ctx.termino().getChildCount()==3
+                    ){
+                        int indexTemp=this.variableTempIndex;
+                        sentencia+="t"+this.variableTempIndex+"="+visit(ctx.expresion());
+                        sentencia+="\n";
+                        this.variableTempIndex++;
+                        sentencia+=visit(ctx.termino());
+
+                        sentencia+="t"+this.variableTempIndex+"=";
+                        sentencia+="t"+indexTemp;
+                        sentencia+=ctx.operadores_de_menor_orden().getText();
+                        sentencia+="t"+(this.variableTempIndex-1);
+                        sentencia+="\n";
+                    }
+                    else {
                         int indiceTemp=this.variableTempIndex;
                         //te fijas si no es recursivo
                         if(ctx.expresion().expresion()==null){
@@ -146,12 +164,32 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                         //tengo que ver si el lazo izquierdo esta solo o no 
                         //si no está solo... 
                         if(ctx.expresion().termino().getChildCount()==3){
+                            //me fijo si los 2 lados tienen mas de 1 miembro o termino
+                            if(ctx.expresion().termino().getChildCount()==3 &&
+                            ctx.termino().factor().factor_con_parentesis()!=null && 
+                            ctx.termino().factor().factor_con_parentesis().expresion()!=null &&
+                            ctx.termino().factor().factor_con_parentesis().expresion().getChildCount()==3
+                            ){
+                                sentencia+=visit(ctx.expresion());
+                                int indexTemp=this.variableTempIndex-1;
+                                sentencia+=visit(ctx.termino());
+                                sentencia+="t"+this.variableTempIndex+"=";
+                                sentencia+="t"+indexTemp;
+                                sentencia+=ctx.operadores_de_menor_orden().getText();
+                                sentencia+="t"+(this.variableTempIndex-1);
+                                sentencia+="\n";
+                                /*int indexTemp=this.variableTempIndex-1;
+                                sentencia+="taa"+this.variableTempIndex+"=";
+                                sentencia+="t"+indexTemp;
+                                sentencia+=ctx.operadores_de_menor_orden().getText()+visit(ctx.termino())+"\n";*/
+                            } else {
+                                sentencia+=visit(ctx.expresion());
+                                int indexTemp=this.variableTempIndex-1;
+                                sentencia+="t"+this.variableTempIndex+"=";
+                                sentencia+="t"+indexTemp;
+                                sentencia+=ctx.operadores_de_menor_orden().getText()+visit(ctx.termino())+"\n";
+                            }
                             
-                            sentencia+=visit(ctx.expresion());
-                            int indexTemp=this.variableTempIndex-1;
-                            sentencia+="t"+this.variableTempIndex+"=";
-                            sentencia+="t"+indexTemp;
-                            sentencia+=ctx.operadores_de_menor_orden().getText()+visit(ctx.termino())+"\n";
 
                         }
                         else {
@@ -177,7 +215,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                             //sentencia+=ctx.operadores_de_menor_orden().getText();
                         } else if(parentExpresion instanceof ExpresionContext && ((ExpresionContext)parentExpresion).termino().factor().factor_con_parentesis()!=null){
                             //x=2+2+(b+c);
-                            System.out.println("aaaa==> "+ctx.getText());
+                            //System.out.println("aaaa==> "+ctx.getText());
                             sentencia+="t"+this.variableTempIndex+"=";
                             sentencia+=visit(ctx.expresion());
                             sentencia+=visit(ctx.operadores_de_menor_orden());
@@ -185,8 +223,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                             sentencia+="\n";
                         }
                         else {
-                            System.out.println("bbbb==> "+ctx.getText());
-                            //stefanoooo
+                            //System.out.println("bbbb==> "+ctx.getText());
                             sentencia+="t"+this.variableTempIndex+"=";
                             sentencia+=visit(ctx.expresion())+ctx.operadores_de_menor_orden().getText();
                             sentencia+=visit(ctx.termino());
