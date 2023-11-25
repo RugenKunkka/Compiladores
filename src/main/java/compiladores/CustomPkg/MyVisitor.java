@@ -287,7 +287,20 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
             sentencia+= visit(ctx.factor());
         } else if(ctx.getChildCount()==3) {
             //es recursivo???
-            if(ctx.termino().termino()!=null){
+            if(ctx.termino()!=null && ctx.termino().getChildCount()==3 &&
+                ctx.factor().factor_con_parentesis()!=null &&
+                ctx.factor().factor_con_parentesis().expresion().getChildCount()==3){
+                sentencia+=visit(ctx.termino());
+                int tempIndex=this.variableTempIndex-1;
+                sentencia+=visit(ctx.factor());
+
+                sentencia+="t"+this.variableTempIndex+"=";
+                sentencia+="t"+tempIndex;
+                sentencia+=ctx.operadores_mayor_orden().getText();
+                sentencia+="t"+(this.variableTempIndex-1);
+                sentencia+="\n";
+            }
+            else if(ctx.termino().termino()!=null){
                 sentencia+=visit(ctx.termino());
                 sentencia+="t"+(this.variableTempIndex)+"=";
                 sentencia+="t"+(this.variableTempIndex-1);
