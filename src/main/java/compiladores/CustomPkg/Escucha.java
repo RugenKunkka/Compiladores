@@ -176,7 +176,7 @@ public class Escucha extends ExpRegBaseListener{
     public void exitAsignacion(AsignacionContext ctx) {
         
         if(ctx.ID_NOMBRE_VAR_FUNC()!=null){
-            if( this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText())==null){
+           if( ctx.ID_NOMBRE_VAR_FUNC()!=null && this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText())==null){
                 System.out.println("No se encuentra declarada la variable: "+ctx.ID_NOMBRE_VAR_FUNC().getText());
             }
         }

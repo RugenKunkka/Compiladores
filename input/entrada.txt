@@ -31,3 +31,27 @@
 //int K;
 //x=b*b+e-4*a*c*e;
 //x=b+b+e-4*a*c*e;
+
+//NO ANDA
+//x=(2-3);
+
+//int suma(int a, float b){
+    //int c=a+b;
+    //return c;
+//}
+//int main(){
+    //int j;
+   // j=3333;
+  //  j=suma(2,3);
+    //suma(8,6);
+//}
+
+//x1 = b + ( b * b - 4 * a * c ) / 2 / a ;
+//x2 = b - ( b * b - 4 * a * c ) / 2 / a ;
+
+x = 4;
+y = x / 2;
+z = 2 * x + 5 * y;
+
+
+

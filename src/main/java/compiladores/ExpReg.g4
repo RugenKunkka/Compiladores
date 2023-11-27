@@ -135,7 +135,8 @@ tipo_variable : TIPO_INT
               | TIPO_FLOAT 
               | TIPO_DOUBLE ;//yo genero el token con el tipo de variable
 
-asignacion: ID_NOMBRE_VAR_FUNC IGUAL expresion
+asignacion:  ID_NOMBRE_VAR_FUNC IGUAL llamada_funcion
+            |ID_NOMBRE_VAR_FUNC IGUAL expresion
           ;
 
 //lado derecho de la

@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import compiladores.CustomPkg.Escucha;
 import compiladores.CustomPkg.MyVisitor;
+import compiladores.CustomPkg.Optimizador;
 
 // Las diferentes entradas se explicaran oportunamente
 public class App {
@@ -42,6 +43,10 @@ public class App {
         // Conectamos el visitor
         MyVisitor myVisitor = new MyVisitor();
         myVisitor.visit(tree);
+
+        Optimizador optimizador=new Optimizador(myVisitor.getCodigoIntermedioCompleto());
+        optimizador.optimizar();
+        optimizador.printCodigoOptimizado();
         //System.out.println(myVisitor);
         
         //System.out.println(myVisitor.getErrorNodes());

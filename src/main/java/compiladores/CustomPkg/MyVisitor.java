@@ -49,6 +49,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     
     String codigoIntermedio="";
     String codigoIntermedioTemp="";
+    String codigoIntermedioCompleto="";
     
     ArrayList<ErrorNode> errores;
 
@@ -536,14 +537,18 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         String sentenceToReturn="";
         /*sentenceToReturn+=visit(ctx.expresion());
         sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";*/
-        if(ctx.expresion().getChildCount()==3){
-            sentenceToReturn+=visit(ctx.expresion());
-            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
-        } else if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==1){
-            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
-        } else {
-            sentenceToReturn+=visit(ctx.expresion());
-            sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
+        if(ctx.expresion()!=null){
+            if(ctx.expresion().getChildCount()==3){
+                sentenceToReturn+=visit(ctx.expresion());
+                sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
+            } else if(ctx.expresion()!=null && ctx.expresion().termino().getChildCount()==1){
+                sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"="+visit(ctx.expresion())+"\n";
+            } else {
+                sentenceToReturn+=visit(ctx.expresion());
+                sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC()+"=t"+(this.variableTempIndex-1)+"\n";
+            }
+        } else if(ctx.llamada_funcion()!=null){
+            sentenceToReturn+=visit(ctx.llamada_funcion());
         }
         
         
@@ -806,6 +811,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         }
         System.out.println("-----------------PROGRAMA-----------------");
         System.out.println(programa);
+        codigoIntermedioCompleto=programa;
         return "";
     }
 
@@ -828,6 +834,10 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
     @Override
     public String toString() {
         return this.codigoIntermedio;
+    }
+
+    public String getCodigoIntermedioCompleto(){
+        return codigoIntermedioCompleto;
     }
 
 }
