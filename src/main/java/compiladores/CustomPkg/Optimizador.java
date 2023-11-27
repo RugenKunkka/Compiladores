@@ -226,15 +226,11 @@ public class Optimizador {
                             String termino2=ladoDerTemp.split(operador)[1];*/
                             String termino1="";
                             String termino2="";
-                            if(operador.equals("*")){
-                                int indiceAsterisco = ladoDerTemp.indexOf("*");
-                                termino1 = ladoDerTemp.substring(0, indiceAsterisco);
-                                termino2 = ladoDerTemp.substring(indiceAsterisco + 1);
-                            }
-                            else{
-                                termino1=ladoDerTemp.split(operador)[0];
-                                termino2=ladoDerTemp.split(operador)[1];
-                            }
+                            
+                            int indiceOperador = ladoDerTemp.indexOf(operador);
+                            termino1 = ladoDerTemp.substring(0, indiceOperador);
+                            termino2 = ladoDerTemp.substring(indiceOperador + 1);
+                            
                             
                             boolean reemplazmos=false;
                             for(int q=0;q<tParaReemplazar.size();q++){
