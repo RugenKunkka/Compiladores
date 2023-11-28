@@ -36,8 +36,6 @@ public class Optimizador {
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<this.arrayDeInstrucciones.size();i++){
             if(arrayDeInstrucciones.get(i).contains("=")){
-                //break;
-            
                 String ladoIzquierdo=arrayDeInstrucciones.get(i).split("=")[0];
                 String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
                 if(!verificarSiTieneLetraOGuion(ladoDerecho)){
@@ -107,58 +105,56 @@ public class Optimizador {
     private void reemplazarDeIzquierdaADerecha(){
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<arrayDeInstrucciones.size();i++){
-            if(!arrayDeInstrucciones.get(i).contains("=")){
-                break;
-            }
-            String ladoIzquerdo=arrayDeInstrucciones.get(i).split("=")[0];
-            String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
-            boolean contieneOperadores=false;
-            for(String operador:operadores){
-                if(ladoDerecho.contains(operador)){//si no hay operador es xq está solo y estamos en condiciones de reemplazar en las próximas sentencias
-                    contieneOperadores=true;
-                    break;
-                }
-            }
-            if(!contieneOperadores){
-                boolean reemplazamosUnaVez=false;
-                for(int j=i+1;j<arrayDeInstrucciones.size();j++){
-                    //si tenía t0=b; tengo que buscar ahora del lado derecho en las prox instruccioens t0 y reemplazarlas por b y si en algun momento reemplazo, tengo que
-                    //eliminar la sentencia o instruccion completa
-                    if(!arrayDeInstrucciones.get(j).contains("=")){
+            if(arrayDeInstrucciones.get(i).contains("=")){
+                String ladoIzquerdo=arrayDeInstrucciones.get(i).split("=")[0];
+                String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
+                boolean contieneOperadores=false;
+                for(String operador:operadores){
+                    if(ladoDerecho.contains(operador)){//si no hay operador es xq está solo y estamos en condiciones de reemplazar en las próximas sentencias
+                        contieneOperadores=true;
                         break;
                     }
-                    String ladoDerTemp=arrayDeInstrucciones.get(j).split("=")[1];
-                    for(String operador:operadores){
-                        if(ladoDerTemp.contains(operador)){
-                            int indiceAsterisco = ladoDerTemp.indexOf(operador);
-                            String termino1 = ladoDerTemp.substring(0, indiceAsterisco);
-                            String termino2 = ladoDerTemp.substring(indiceAsterisco + 1);
-                            boolean podemosReemplazar=false;
-                            if(termino1.equals(ladoIzquerdo)){
-                                termino1=ladoDerecho;
-                                podemosReemplazar=true;
-                            }
-                            if(termino2.equals(ladoIzquerdo)){
-                                termino2=ladoDerecho;
-                                podemosReemplazar=true;
-                            }
-                            if(podemosReemplazar){
-                                String sentenciaTemporal="";
-                                sentenciaTemporal+=arrayDeInstrucciones.get(j).split("=")[0];
-                                sentenciaTemporal+="=";
-                                sentenciaTemporal+=termino1;
-                                sentenciaTemporal+=operador;
-                                sentenciaTemporal+=termino2;
-                                arrayDeInstrucciones.set(j, sentenciaTemporal);
-                                reemplazamosUnaVez=true;
-                            }
-                            break;
-                        }
-                    }   
                 }
-                if(reemplazamosUnaVez){
-                    arrayDeInstrucciones.remove(i);
-                    i--;
+                if(!contieneOperadores){
+                    boolean reemplazamosUnaVez=false;
+                    for(int j=i+1;j<arrayDeInstrucciones.size();j++){
+                        //si tenía t0=b; tengo que buscar ahora del lado derecho en las prox instruccioens t0 y reemplazarlas por b y si en algun momento reemplazo, tengo que
+                        //eliminar la sentencia o instruccion completa
+                        if(arrayDeInstrucciones.get(j).contains("=")){ 
+                            String ladoDerTemp=arrayDeInstrucciones.get(j).split("=")[1];
+                            for(String operador:operadores){
+                                if(ladoDerTemp.contains(operador)){
+                                    int indiceAsterisco = ladoDerTemp.indexOf(operador);
+                                    String termino1 = ladoDerTemp.substring(0, indiceAsterisco);
+                                    String termino2 = ladoDerTemp.substring(indiceAsterisco + 1);
+                                    boolean podemosReemplazar=false;
+                                    if(termino1.equals(ladoIzquerdo)){
+                                        termino1=ladoDerecho;
+                                        podemosReemplazar=true;
+                                    }
+                                    if(termino2.equals(ladoIzquerdo)){
+                                        termino2=ladoDerecho;
+                                        podemosReemplazar=true;
+                                    }
+                                    if(podemosReemplazar){
+                                        String sentenciaTemporal="";
+                                        sentenciaTemporal+=arrayDeInstrucciones.get(j).split("=")[0];
+                                        sentenciaTemporal+="=";
+                                        sentenciaTemporal+=termino1;
+                                        sentenciaTemporal+=operador;
+                                        sentenciaTemporal+=termino2;
+                                        arrayDeInstrucciones.set(j, sentenciaTemporal);
+                                        reemplazamosUnaVez=true;
+                                    }
+                                    break;
+                                }
+                            }   
+                        }
+                    }
+                    if(reemplazamosUnaVez){
+                        arrayDeInstrucciones.remove(i);
+                        i--;
+                    }
                 }
             }
 
@@ -172,38 +168,39 @@ public class Optimizador {
     private void reemplazarDerechaPorDerecha(){
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<arrayDeInstrucciones.size();i++){
-            if(!arrayDeInstrucciones.get(i).contains("=")){
-                break;
-            }
-            String ladoIzquierdo=arrayDeInstrucciones.get(i).split("=")[0];
-            String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
-            boolean seReemplazoUnaVez=false;
-            for(String operador:operadores){
-                if(ladoDerecho.contains(operador)){
-                    for(int j=i+1;j<arrayDeInstrucciones.size();j++){
-                        String ladoIzquierdoTemp=arrayDeInstrucciones.get(j).split("=")[0];
-                        String ladoDerechoTemp=arrayDeInstrucciones.get(j).split("=")[1];
-                        boolean sePuedeReemplazar=false;
-                        if(ladoDerechoTemp.equals(ladoIzquierdo)){
-                            ladoDerechoTemp=ladoDerecho;
-                            sePuedeReemplazar=true;
+            if(arrayDeInstrucciones.get(i).contains("=")){
+                String ladoIzquierdo=arrayDeInstrucciones.get(i).split("=")[0];
+                String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
+                boolean seReemplazoUnaVez=false;
+                for(String operador:operadores){
+                    if(ladoDerecho.contains(operador)){
+                        for(int j=i+1;j<arrayDeInstrucciones.size();j++){
+                            String ladoIzquierdoTemp=arrayDeInstrucciones.get(j).split("=")[0];
+                            String ladoDerechoTemp=arrayDeInstrucciones.get(j).split("=")[1];
+                            boolean sePuedeReemplazar=false;
+                            if(ladoDerechoTemp.equals(ladoIzquierdo)){
+                                ladoDerechoTemp=ladoDerecho;
+                                sePuedeReemplazar=true;
+                            }
+                            if(sePuedeReemplazar){
+                                String sentenciaTemporal="";
+                                sentenciaTemporal+=ladoIzquierdoTemp;
+                                sentenciaTemporal+="=";
+                                sentenciaTemporal+=ladoDerecho;
+                                arrayDeInstrucciones.set(j, sentenciaTemporal);
+                                seReemplazoUnaVez=true;
+                            }
+                            
                         }
-                        if(sePuedeReemplazar){
-                            String sentenciaTemporal="";
-                            sentenciaTemporal+=ladoIzquierdoTemp;
-                            sentenciaTemporal+="=";
-                            sentenciaTemporal+=ladoDerecho;
-                            arrayDeInstrucciones.set(j, sentenciaTemporal);
-                            seReemplazoUnaVez=true;
-                        }
-                        
                     }
                 }
+                if(seReemplazoUnaVez){
+                    arrayDeInstrucciones.remove(i);
+                    i--;
+                }
             }
-            if(seReemplazoUnaVez){
-                arrayDeInstrucciones.remove(i);
-                i--;
-            }
+            
+
         }
     }
 
@@ -220,54 +217,52 @@ public class Optimizador {
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<arrayDeInstrucciones.size();i++){
             String instruccion=arrayDeInstrucciones.get(i);
-            if(!instruccion.contains("=")){
-                break;
-            }
-            String ladoIzquierdoDeLaIgualdad=instruccion.split("=")[0];
-            String ladoDerechoIgualdad="="+instruccion.split("=")[1];
-            ArrayList<String> tParaReemplazar = new ArrayList<String>();
-            for(int j=i+1;j<arrayDeInstrucciones.size();j++){
-                if(!arrayDeInstrucciones.contains("=")){
-                    break;
-                }
-                String ladoDerTemp="="+arrayDeInstrucciones.get(j).split("=")[1];
-                if(ladoDerTemp.equals(ladoDerechoIgualdad)){
-                    tParaReemplazar.add(arrayDeInstrucciones.get(j).split("=")[0]);
-                    arrayDeInstrucciones.remove(j);
-                    j--;
-                } else if(tParaReemplazar.size()>0){
-                    ladoDerTemp=ladoDerTemp.replaceAll("=", "");
-                    for(String operador: operadores){
-                        if(ladoDerTemp.contains(operador)){
-                                                        
-                            int indiceOperador = ladoDerTemp.indexOf(operador);
-                            String termino1 = ladoDerTemp.substring(0, indiceOperador);
-                            String termino2 = ladoDerTemp.substring(indiceOperador + 1);
-                                                        
-                            boolean reemplazmos=false;
-                            for(int q=0;q<tParaReemplazar.size();q++){
-                                if(tParaReemplazar.get(q).equals(termino1)){
-                                    termino1=ladoIzquierdoDeLaIgualdad;
-                                    //System.out.println(tParaReemplazar.get(q));
-                                    reemplazmos=true;
-                                }
-                                if(tParaReemplazar.get(q).equals(termino2)){
-                                    termino2=ladoIzquierdoDeLaIgualdad;
-                                    //System.out.println(tParaReemplazar.get(q));
-                                    reemplazmos=true;
+            if(instruccion.contains("=")){
+                String ladoIzquierdoDeLaIgualdad=instruccion.split("=")[0];
+                String ladoDerechoIgualdad="="+instruccion.split("=")[1];
+                ArrayList<String> tParaReemplazar = new ArrayList<String>();
+                for(int j=i+1;j<arrayDeInstrucciones.size();j++){
+                    if(arrayDeInstrucciones.contains("=")){
+                        String ladoDerTemp="="+arrayDeInstrucciones.get(j).split("=")[1];
+                        if(ladoDerTemp.equals(ladoDerechoIgualdad)){
+                            tParaReemplazar.add(arrayDeInstrucciones.get(j).split("=")[0]);
+                            arrayDeInstrucciones.remove(j);
+                            j--;
+                        } else if(tParaReemplazar.size()>0){
+                            ladoDerTemp=ladoDerTemp.replaceAll("=", "");
+                            for(String operador: operadores){
+                                if(ladoDerTemp.contains(operador)){
+                                                                
+                                    int indiceOperador = ladoDerTemp.indexOf(operador);
+                                    String termino1 = ladoDerTemp.substring(0, indiceOperador);
+                                    String termino2 = ladoDerTemp.substring(indiceOperador + 1);
+                                                                
+                                    boolean reemplazmos=false;
+                                    for(int q=0;q<tParaReemplazar.size();q++){
+                                        if(tParaReemplazar.get(q).equals(termino1)){
+                                            termino1=ladoIzquierdoDeLaIgualdad;
+                                            //System.out.println(tParaReemplazar.get(q));
+                                            reemplazmos=true;
+                                        }
+                                        if(tParaReemplazar.get(q).equals(termino2)){
+                                            termino2=ladoIzquierdoDeLaIgualdad;
+                                            //System.out.println(tParaReemplazar.get(q));
+                                            reemplazmos=true;
+                                        }
+                                    }
+                                    if(reemplazmos==true){
+                                        String sentenciaTemp="";
+                                        sentenciaTemp+=arrayDeInstrucciones.get(j).split("=")[0];
+                                        sentenciaTemp+="=";
+                                        sentenciaTemp+=termino1;
+                                        sentenciaTemp+=operador;
+                                        sentenciaTemp+=termino2;
+                                        arrayDeInstrucciones.set(j,sentenciaTemp);
+                                    }
+                                    
+                                    break;
                                 }
                             }
-                            if(reemplazmos==true){
-                                String sentenciaTemp="";
-                                sentenciaTemp+=arrayDeInstrucciones.get(j).split("=")[0];
-                                sentenciaTemp+="=";
-                                sentenciaTemp+=termino1;
-                                sentenciaTemp+=operador;
-                                sentenciaTemp+=termino2;
-                                arrayDeInstrucciones.set(j,sentenciaTemp);
-                            }
-                            
-                            break;
                         }
                     }
                 }
