@@ -390,8 +390,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         bloqueFuncionToReturn+=("--------------------BLOQUE FUNCION "+"--------------------")+"\n";
         String variables=visit(ctx.declaracion_funcion());
 
-        bloqueFuncionToReturn+="lbl e"+this.labelEIndex+"\n";
-        this.labelEIndex++;
+        bloqueFuncionToReturn+="lbl "+ctx.declaracion_funcion().ID_NOMBRE_VAR_FUNC().getText()+"\n";
         if(variables.length()>0){
             String[] splitedVariables=variables.split(",");
             for(int i=0; i<splitedVariables.length;i++){
@@ -796,7 +795,14 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         sentenceToReturn+=visit(ctx.parametros_para_llamada());
         sentenceToReturn+="call "+ctx.ID_NOMBRE_VAR_FUNC().getText()+"\n";
         //si tiene dato para devolver???
-        sentenceToReturn+="POP "+"\n";
+        ParserRuleContext nodoAsignacion = ctx.getParent();
+        if(nodoAsignacion!=null && nodoAsignacion instanceof AsignacionContext){
+            sentenceToReturn+="POP "+((AsignacionContext)nodoAsignacion).ID_NOMBRE_VAR_FUNC() +"\n";
+        } else 
+        {
+            sentenceToReturn+="POP \n";//creo que acá al hacer el POP vacías parte del STACK
+        }
+        
 
         return sentenceToReturn;
     }
