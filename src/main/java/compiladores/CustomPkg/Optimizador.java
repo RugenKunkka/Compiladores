@@ -35,32 +35,34 @@ public class Optimizador {
     public void propagacionDeConstantes(){
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<this.arrayDeInstrucciones.size();i++){
-            String ladoIzquierdo=arrayDeInstrucciones.get(i).split("=")[0];
-            String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
-            if(!verificarSiTieneLetraOGuion(ladoDerecho)){
-                for(String operador:operadores){
-                    if(ladoDerecho.contains(operador)){
-                         int indiceAsterisco = ladoDerecho.indexOf(operador);
-                        float numero1 = Float.parseFloat(ladoDerecho.substring(0, indiceAsterisco));
-                        float numero2 = Float.parseFloat(ladoDerecho.substring(indiceAsterisco + 1));
-                        //float numero1=Float.parseFloat(ladoDerecho.split(operador)[0]);
-                        //float numero2=Float.parseFloat(ladoDerecho.split(operador)[1]);
-                        float resultado=0;
-                        if(operador.equals("+")){
-                            resultado=numero1+numero2;
-                        } else if(operador.equals("-")){
-                            resultado=numero1-numero2;
-                        } else if(operador.equals("*")){
-                            resultado=numero1*numero2;
-                        } else {
-                            resultado=numero1/numero2;
-                        }
-                        if(!tieneDecimales(resultado)){
-                            String sentenciaNueva="";
-                            sentenciaNueva+=ladoIzquierdo;
-                            sentenciaNueva+="=";
-                            sentenciaNueva+=Integer.toString((int)resultado);
-                            arrayDeInstrucciones.set(i,sentenciaNueva);
+            if(arrayDeInstrucciones.get(i).contains("=")){
+                //break;
+            
+                String ladoIzquierdo=arrayDeInstrucciones.get(i).split("=")[0];
+                String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
+                if(!verificarSiTieneLetraOGuion(ladoDerecho)){
+                    for(String operador:operadores){
+                        if(ladoDerecho.contains(operador)){
+                            int indiceAsterisco = ladoDerecho.indexOf(operador);
+                            float numero1 = Float.parseFloat(ladoDerecho.substring(0, indiceAsterisco));
+                            float numero2 = Float.parseFloat(ladoDerecho.substring(indiceAsterisco + 1));
+                            float resultado=0;
+                            if(operador.equals("+")){
+                                resultado=numero1+numero2;
+                            } else if(operador.equals("-")){
+                                resultado=numero1-numero2;
+                            } else if(operador.equals("*")){
+                                resultado=numero1*numero2;
+                            } else {
+                                resultado=numero1/numero2;
+                            }
+                            if(!tieneDecimales(resultado)){
+                                String sentenciaNueva="";
+                                sentenciaNueva+=ladoIzquierdo;
+                                sentenciaNueva+="=";
+                                sentenciaNueva+=Integer.toString((int)resultado);
+                                arrayDeInstrucciones.set(i,sentenciaNueva);
+                            }
                         }
                     }
                 }
@@ -105,6 +107,9 @@ public class Optimizador {
     private void reemplazarDeIzquierdaADerecha(){
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<arrayDeInstrucciones.size();i++){
+            if(!arrayDeInstrucciones.get(i).contains("=")){
+                break;
+            }
             String ladoIzquerdo=arrayDeInstrucciones.get(i).split("=")[0];
             String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
             boolean contieneOperadores=false;
@@ -119,6 +124,9 @@ public class Optimizador {
                 for(int j=i+1;j<arrayDeInstrucciones.size();j++){
                     //si tenía t0=b; tengo que buscar ahora del lado derecho en las prox instruccioens t0 y reemplazarlas por b y si en algun momento reemplazo, tengo que
                     //eliminar la sentencia o instruccion completa
+                    if(!arrayDeInstrucciones.get(j).contains("=")){
+                        break;
+                    }
                     String ladoDerTemp=arrayDeInstrucciones.get(j).split("=")[1];
                     for(String operador:operadores){
                         if(ladoDerTemp.contains(operador)){
@@ -164,6 +172,9 @@ public class Optimizador {
     private void reemplazarDerechaPorDerecha(){
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<arrayDeInstrucciones.size();i++){
+            if(!arrayDeInstrucciones.get(i).contains("=")){
+                break;
+            }
             String ladoIzquierdo=arrayDeInstrucciones.get(i).split("=")[0];
             String ladoDerecho=arrayDeInstrucciones.get(i).split("=")[1];
             boolean seReemplazoUnaVez=false;
@@ -209,10 +220,16 @@ public class Optimizador {
         String[] operadores={"+","-","*","/"};
         for(int i=0; i<arrayDeInstrucciones.size();i++){
             String instruccion=arrayDeInstrucciones.get(i);
+            if(!instruccion.contains("=")){
+                break;
+            }
             String ladoIzquierdoDeLaIgualdad=instruccion.split("=")[0];
             String ladoDerechoIgualdad="="+instruccion.split("=")[1];
             ArrayList<String> tParaReemplazar = new ArrayList<String>();
             for(int j=i+1;j<arrayDeInstrucciones.size();j++){
+                if(!arrayDeInstrucciones.contains("=")){
+                    break;
+                }
                 String ladoDerTemp="="+arrayDeInstrucciones.get(j).split("=")[1];
                 if(ladoDerTemp.equals(ladoDerechoIgualdad)){
                     tParaReemplazar.add(arrayDeInstrucciones.get(j).split("=")[0]);
@@ -222,16 +239,11 @@ public class Optimizador {
                     ladoDerTemp=ladoDerTemp.replaceAll("=", "");
                     for(String operador: operadores){
                         if(ladoDerTemp.contains(operador)){
-                            /*String termino1=ladoDerTemp.split(operador)[0];
-                            String termino2=ladoDerTemp.split(operador)[1];*/
-                            String termino1="";
-                            String termino2="";
-                            
+                                                        
                             int indiceOperador = ladoDerTemp.indexOf(operador);
-                            termino1 = ladoDerTemp.substring(0, indiceOperador);
-                            termino2 = ladoDerTemp.substring(indiceOperador + 1);
-                            
-                            
+                            String termino1 = ladoDerTemp.substring(0, indiceOperador);
+                            String termino2 = ladoDerTemp.substring(indiceOperador + 1);
+                                                        
                             boolean reemplazmos=false;
                             for(int q=0;q<tParaReemplazar.size();q++){
                                 if(tParaReemplazar.get(q).equals(termino1)){

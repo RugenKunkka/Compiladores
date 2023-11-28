@@ -1,0 +1,4 @@
+>ID:q tipoDato:12 esUsada?: true EstaInicializada?:true
+>ID:w tipoDato:12 esUsada?: false EstaInicializada?:true
+>ID:e tipoDato:12 esUsada?: false EstaInicializada?:true
+>ID:c tipoDato:11 esUsada?: false EstaInicializada?:false

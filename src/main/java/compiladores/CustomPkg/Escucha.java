@@ -31,6 +31,8 @@ import compiladores.ExpRegParser.Variable_o_parametro_aisladaContext;
 //con ctrl + espacio tenes el shortcut para hacer override o implementaciones
 public class Escucha extends ExpRegBaseListener{
 
+    public static final int CODIGO_TIPO_INT=11;
+
     private TablaSimbolos tablaSimbolos; // Instancia de TablaSimbolos
     private ArrayList<Identificador> identificadoresTemp;
     int bufferTempParametrosParaLlamada;
@@ -68,6 +70,21 @@ public class Escucha extends ExpRegBaseListener{
         for(Variable variable : variables ){
             this.tablaSimbolos.agregarId(variable);
             aImprimir= aImprimir + variable.toString()+", ";
+            if (ctx.tipo_variable().getText().equals("int")) {
+                if(ctx.getText().contains("=")){
+                    String ladoDerecho=ctx.getText().split("=")[1];
+                    if(ladoDerecho.contains(".")){
+                        System.out.println("Warning: a la variable <<"+ctx.ID_NOMBRE_VAR_FUNC().getText()+">> Se le esta queriendo asignar un numero decimal siendo que ésta es del tipo INT==> "+ladoDerecho);
+                    }
+                }
+            }else if(ctx.tipo_variable().getText().equals("double") || ctx.tipo_variable().getText().equals("float")){
+                if(ctx.getText().contains("=")){
+                    String ladoDerecho=ctx.getText().split("=")[1];
+                    if(!ladoDerecho.contains(".")){
+                        System.out.println("Warning: a la variable <<"+ctx.ID_NOMBRE_VAR_FUNC().getText()+">> Se le esta queriendo asignar un numero entero siendo que ésta es del tipo "+ctx.tipo_variable().getText()+"==> "+ladoDerecho);
+                    }
+                }
+            }
         }
         
     }
@@ -178,6 +195,13 @@ public class Escucha extends ExpRegBaseListener{
         if(ctx.ID_NOMBRE_VAR_FUNC()!=null){
            if( ctx.ID_NOMBRE_VAR_FUNC()!=null && this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText())==null){
                 System.out.println("No se encuentra declarada la variable: "+ctx.ID_NOMBRE_VAR_FUNC().getText());
+            } else{//quiere decir que la encontre a la fariable
+                
+                /*boolean esTipoDecimal=ctx.getText().contains(".")?true:false;
+                Identificador identificador=this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText());
+                if(identificador.getTipoDato()==CODIGO_TIPO_INT && esTipoDecimal){
+                    System.out.println("Warning: se esta asiganando a la variable "+ctx.ID_NOMBRE_VAR_FUNC().getText()+" de tipo int un tipo de dato que no corresponde");
+                }*/
             }
         }
     }

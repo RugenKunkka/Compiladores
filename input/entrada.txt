@@ -46,12 +46,23 @@
     //suma(8,6);
 //}
 
-x1 = b + ( b * b - 4 * a * c ) / 2 / a ;
-x2 = b - ( b * b - 4 * a * c ) / 2 / a ;
+//x1 = b + ( b * b - 4 * a * c ) / 2 / a ;
+//x2 = b - ( b * b - 4 * a * c ) / 2 / a ;
 
-x = 4;
-y = x / 2;
-z = 2 * x + 5 * y;
+//x = 4;
+//y = x / 2;
+//z = 2 * x + 5 * y;
+
+//int t=8.7;
+//float q,w,e=2;
+//float u,i,o=2.2;
+//float a=3;
+//float b;
+//b=3;
+float q,w,e=2;
+int c;
+c=8.9 + q;
+
 
 
 
