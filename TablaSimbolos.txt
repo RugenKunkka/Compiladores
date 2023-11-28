@@ -1,4 +1,12 @@
+>ID:suma tipoDato:12 esUsada?: true EstaInicializada?:true argumentos: 11 12 
+====>ID:a tipoDato:11 esUsada?: true EstaInicializada?:false
+====>ID:b tipoDato:12 esUsada?: true EstaInicializada?:false
+====>ID:c tipoDato:11 esUsada?: true EstaInicializada?:true
+>ID:main tipoDato:11 esUsada?: false EstaInicializada?:true argumentos: 
+====>ID:j tipoDato:12 esUsada?: false EstaInicializada?:true
 >ID:q tipoDato:12 esUsada?: true EstaInicializada?:true
 >ID:w tipoDato:12 esUsada?: false EstaInicializada?:true
 >ID:e tipoDato:12 esUsada?: false EstaInicializada?:true
->ID:c tipoDato:11 esUsada?: false EstaInicializada?:false
+>ID:a tipoDato:11 esUsada?: true EstaInicializada?:true
+>ID:b tipoDato:11 esUsada?: true EstaInicializada?:true
+>ID:c tipoDato:12 esUsada?: false EstaInicializada?:true

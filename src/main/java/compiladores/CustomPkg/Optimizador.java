@@ -175,20 +175,22 @@ public class Optimizador {
                 for(String operador:operadores){
                     if(ladoDerecho.contains(operador)){
                         for(int j=i+1;j<arrayDeInstrucciones.size();j++){
-                            String ladoIzquierdoTemp=arrayDeInstrucciones.get(j).split("=")[0];
-                            String ladoDerechoTemp=arrayDeInstrucciones.get(j).split("=")[1];
-                            boolean sePuedeReemplazar=false;
-                            if(ladoDerechoTemp.equals(ladoIzquierdo)){
-                                ladoDerechoTemp=ladoDerecho;
-                                sePuedeReemplazar=true;
-                            }
-                            if(sePuedeReemplazar){
-                                String sentenciaTemporal="";
-                                sentenciaTemporal+=ladoIzquierdoTemp;
-                                sentenciaTemporal+="=";
-                                sentenciaTemporal+=ladoDerecho;
-                                arrayDeInstrucciones.set(j, sentenciaTemporal);
-                                seReemplazoUnaVez=true;
+                                if(arrayDeInstrucciones.get(j).contains("=")){
+                                String ladoIzquierdoTemp=arrayDeInstrucciones.get(j).split("=")[0];
+                                String ladoDerechoTemp=arrayDeInstrucciones.get(j).split("=")[1];
+                                boolean sePuedeReemplazar=false;
+                                if(ladoDerechoTemp.equals(ladoIzquierdo)){
+                                    ladoDerechoTemp=ladoDerecho;
+                                    sePuedeReemplazar=true;
+                                }
+                                if(sePuedeReemplazar){
+                                    String sentenciaTemporal="";
+                                    sentenciaTemporal+=ladoIzquierdoTemp;
+                                    sentenciaTemporal+="=";
+                                    sentenciaTemporal+=ladoDerecho;
+                                    arrayDeInstrucciones.set(j, sentenciaTemporal);
+                                    seReemplazoUnaVez=true;
+                                }
                             }
                             
                         }

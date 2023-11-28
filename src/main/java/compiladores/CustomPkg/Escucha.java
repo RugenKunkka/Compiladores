@@ -2,6 +2,8 @@ package compiladores.CustomPkg;
 
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -81,7 +83,7 @@ public class Escucha extends ExpRegBaseListener{
                 if(ctx.getText().contains("=")){
                     String ladoDerecho=ctx.getText().split("=")[1];
                     if(!ladoDerecho.contains(".")){
-                        System.out.println("Warning: a la variable <<"+ctx.ID_NOMBRE_VAR_FUNC().getText()+">> Se le esta queriendo asignar un numero entero siendo que ésta es del tipo "+ctx.tipo_variable().getText()+"==> "+ladoDerecho);
+                        System.out.println("Warning: a la variable <<"+variable.getID()+">> Se le esta queriendo asignar un numero entero siendo que ésta es del tipo "+ctx.tipo_variable().getText()+" en la sentencia ==> "+ctx.getText());
                     }
                 }
             }
@@ -107,6 +109,7 @@ public class Escucha extends ExpRegBaseListener{
     @Override
     public void exitDeclaracion_funcion(Declaracion_funcionContext ctx) {
         Funcion funcion= new Funcion(ctx.ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
+        funcion.setInicializada(true);
         //system.out.println("FUNCION: "+funcion.toString());
 
     }
@@ -116,6 +119,7 @@ public class Escucha extends ExpRegBaseListener{
         if(parentContext instanceof Declaracion_funcionContext){
             Declaracion_funcionContext declaracionFuncionContext = (Declaracion_funcionContext) parentContext;
             Funcion funcion = new Funcion(declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getText(), declaracionFuncionContext.tipo_variable().getStart().getType());//obtengo el nombre de la funcion y el tipo de valor que va a retornar la funcion XD 
+            funcion.setInicializada(true);
             Token idToken = declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getSymbol();
             //system.out.println("EL PADRE ES!!!:"+ funcion.toString());
             this.tablaSimbolos.agregarId(funcion);
@@ -196,13 +200,75 @@ public class Escucha extends ExpRegBaseListener{
            if( ctx.ID_NOMBRE_VAR_FUNC()!=null && this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText())==null){
                 System.out.println("No se encuentra declarada la variable: "+ctx.ID_NOMBRE_VAR_FUNC().getText());
             } else{//quiere decir que la encontre a la fariable
-                
-                /*boolean esTipoDecimal=ctx.getText().contains(".")?true:false;
-                Identificador identificador=this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText());
-                if(identificador.getTipoDato()==CODIGO_TIPO_INT && esTipoDecimal){
-                    System.out.println("Warning: se esta asiganando a la variable "+ctx.ID_NOMBRE_VAR_FUNC().getText()+" de tipo int un tipo de dato que no corresponde");
-                }*/
+                //tenes que ver si al lado tenes una lista de numeros,
+                //tenés que ver si al lado tenes una lista de variables
+                //tenés que ver si al lado tenés una lista de variables y //números
+                //tenés que ver si al lado tenés una función
+                //en base a eso, si son variables o funciones, los buscas dentro de la tabla de símbolos y listo, comparas el tipo
+                if(ctx.getText().contains("=")){
+                    String idVariable=ctx.getText().split("=")[0];
+                    if(this.tablaSimbolos.buscarId(idVariable)!=null){
+                        this.tablaSimbolos.buscarId(idVariable).setInicializada(true);
+                    }
+                    Identificador identificador=this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText());
+                    //si es del tipo entero la variable 
+                    if( identificador!=null && 
+                        identificador.getTipoDato()==CODIGO_TIPO_INT
+                    ){
+                        //tiro un print si alguna de las variables o numeros de la derecha son decimales
+                        String ladoDerechoOperadoresReemplazadosPorMenos=ctx.getText().split("=")[1].replace("+", "-").replace("*","-").replace("/","-");
+                        String[] terminos=ladoDerechoOperadoresReemplazadosPorMenos.split("-");
+                        boolean hayAlgunNumeroOTipoDecimal=false;
+                        for(int i=0;i<terminos.length;i++){
+                            //aca vos sabes que puede ser una llamada a funcion o tiene una letra
+                            if(verificarSiTieneLetraOGuion(terminos[i])){
+                                String variableOFuncion=terminos[i].split("\\(")[0];
+                                Identificador identificador2=this.tablaSimbolos.buscarId(variableOFuncion);
+                                
+                                if(this.tablaSimbolos.buscarId(variableOFuncion)!=null && !this.tablaSimbolos.buscarId(variableOFuncion).getInicializada()){
+                                    System.out.println("Warning: Se está intentando utilizar la variable <<"+variableOFuncion+">> que no ha sido inicializada hasta el momento de ejecutar la instruccion==> "+ctx.getText());
+                                }
+                                if(identificador2!=null && identificador2.getTipoDato()!=CODIGO_TIPO_INT){
+                                    hayAlgunNumeroOTipoDecimal=true;
+                                    System.out.println("Warning: La variable <<"+idVariable+">> es del tipo int y se le esta asignando numeros o variables decimales en la sentencia==> "+ctx.getText());
+                                    //break;
+                                }
+                            }
+                            else {//sabes que si no tiene ni una letra va a ser un número entonces
+                                float numero= Float.parseFloat(terminos[i]);
+                                if(tieneDecimales(numero)){
+                                    hayAlgunNumeroOTipoDecimal=true;
+                                    System.out.println("Warning: La variable <<"+idVariable+">> es del tipo int y se le esta asignando numeros o variables decimales en la sentencia==> "+ctx.getText());
+                                    //break;
+                                }
+                            }
+                            if(hayAlgunNumeroOTipoDecimal){
+                                break;
+                            }
+
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    private static boolean tieneDecimales(double numero){
+        return numero != (int) numero;
+    }
+
+    private boolean verificarSiTieneLetraOGuion(String palabra){
+        String regex = ".*[a-zA-Z_].*";
+
+        // Crea un objeto Pattern y un objeto Matcher
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(palabra);
+
+        // Verifica si la cadena contiene letras
+        if (matcher.matches()) {
+            return true;
+        } else {
+            return false;
         }
     }
 
