@@ -35,6 +35,10 @@
 //NO ANDA
 //x=(2-3);
 
+//float q,w,e=2.5;
+int h=2;
+
+
 float suma(int a, float b){
     int c=a+b;
     return c;
@@ -42,6 +46,13 @@ float suma(int a, float b){
 int main(){
     float j;
     j=suma(2,3);
+    if(j>2){
+        j=j*2;
+    } else if(j<2){
+        j=j/2;
+    } else {
+        j=j-2;
+    }
 }
 
 //x1 = b + ( b * b - 4 * a * c ) / 2 / a ;
@@ -57,7 +68,7 @@ int main(){
 //float a=3;
 //float b;
 //b=3;
-float q,w,e=2.5;
+
 int a=2;
 int b=3;
 float c;

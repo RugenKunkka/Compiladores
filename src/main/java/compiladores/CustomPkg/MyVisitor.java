@@ -472,6 +472,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         }
         else{
             if(visitAsignacionLdResult.length()==0){
+                sentenceToReturn+=ctx.tipo_variable().getText()+" ";
                 sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+visitAsignacionLdResult+"\n";
             } else {
                 if(visitAsignacionLdResult.contains(",")){
@@ -495,6 +496,7 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
                         sentenceToReturn+=visitAsignacionLdResult;
                         sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"=t"+(this.variableTempIndex-1)+"\n";
                     } else {
+                        sentenceToReturn+=ctx.tipo_variable().getText()+" "+ctx.ID_NOMBRE_VAR_FUNC().getText()+"\n";
                         sentenceToReturn+=ctx.ID_NOMBRE_VAR_FUNC().getText()+"="+visitAsignacionLdResult;//no se si va este. lo puse por si acaso
                     }
                     
