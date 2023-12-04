@@ -36,11 +36,22 @@
 //x=(2-3);
 
 //float q,w,e=2.5;
-int h=2;
+int h=2.2;
 
+if(h<3){
+    h=5;
+}
+
+for(int i=0;i<3;i++){
+    int P=3;
+}
 
 float suma(int a, float b){
     int c=a+b;
+    while(2<3){
+        int o;
+        c=c*2;
+    }
     return c;
 }
 int main(){

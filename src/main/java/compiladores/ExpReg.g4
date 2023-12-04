@@ -13,6 +13,11 @@ fragment LETRA : [a-zA-Z] ;
 //estas 2 reglas de abajo comentadas me molestan. tendria que preguntar como evitar que molesten o como concatenar las relas para que quede igual que letra
 
 fragment DIGITO : [0-9] ;
+
+C_WHILE:'while';
+C_FOR:'for';
+C_RETURN:'return';
+
 PA : '(';
 PC : ')';
 LLAVE_APERTURA:'{';
@@ -112,11 +117,10 @@ factor_con_parentesis:PA expresion PC;
 
 //ciclos y condicionales
 //la C es de custom
-c_while:'while';
-bloque_while: c_while comparacion (bloque_instrucciones | instruccion);
 
-c_for:'for';
-bloque_for: c_for PA instruccion comparacion_sin_parentesis FIN_DE_SENTENCIA actualizacion_del_for PC (instruccion | bloque_instrucciones);
+bloque_while: C_WHILE comparacion (bloque_instrucciones | instruccion);
+
+bloque_for: C_FOR PA instruccion comparacion_sin_parentesis FIN_DE_SENTENCIA actualizacion_del_for PC (instruccion | bloque_instrucciones);
 actualizacion_del_for: ID_NOMBRE_VAR_FUNC MAS MAS
                      ;
 
@@ -124,7 +128,7 @@ c_if:'if';
 c_elseif:'else if';
 c_else:'else';
 
-c_return:'return';
+
 
 WS : [ \n\t\r] -> skip ;//descarta todo lo espaciado por ende no le va a interesar si el ; el = etc.. estan a continuacion o con espacio entre los unos y los otros
 
@@ -193,8 +197,8 @@ bloque_funcion: declaracion_funcion bloque_instrucciones
 llamada_funcion: ID_NOMBRE_VAR_FUNC PA parametros_para_llamada PC (CA expresion CC)? (CA expresion CC)?
               ;
 
-retorno_funcion: c_return
-               | c_return expresion
+retorno_funcion: C_RETURN
+               | C_RETURN expresion
                ; 
 //fin funciones
 

@@ -93,7 +93,6 @@ public class Escucha extends ExpRegBaseListener{
 
     @Override
     public void enterBloque_instrucciones(Bloque_instruccionesContext ctx) {
-        //system.out.println("Contexto nuevo!!!");
         this.tablaSimbolos.crearContexto();
         for(Identificador identificador: this.identificadoresTemp){
             this.tablaSimbolos.addArgumentoFuncionMasCercana(identificador.getTipoDato());
@@ -110,7 +109,6 @@ public class Escucha extends ExpRegBaseListener{
     public void exitDeclaracion_funcion(Declaracion_funcionContext ctx) {
         Funcion funcion= new Funcion(ctx.ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
         funcion.setInicializada(true);
-        //system.out.println("FUNCION: "+funcion.toString());
 
     }
     @Override
@@ -121,7 +119,6 @@ public class Escucha extends ExpRegBaseListener{
             Funcion funcion = new Funcion(declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getText(), declaracionFuncionContext.tipo_variable().getStart().getType());//obtengo el nombre de la funcion y el tipo de valor que va a retornar la funcion XD 
             funcion.setInicializada(true);
             Token idToken = declaracionFuncionContext.ID_NOMBRE_VAR_FUNC().getSymbol();
-            //system.out.println("EL PADRE ES!!!:"+ funcion.toString());
             this.tablaSimbolos.agregarId(funcion);
         }
         
@@ -133,7 +130,6 @@ public class Escucha extends ExpRegBaseListener{
     public void exitVariable_o_parametro_aislada(Variable_o_parametro_aisladaContext ctx) {
         Variable variableAislada= new Variable(ctx.ID_NOMBRE_VAR_FUNC().getText(),ctx.tipo_variable().getStart().getType());
         this.identificadoresTemp.add(variableAislada);
-        //system.out.println("VarAislada: "+variableAislada.toString());
     }
 
     
@@ -158,10 +154,6 @@ public class Escucha extends ExpRegBaseListener{
     
     @Override
     public void exitPrograma(ProgramaContext ctx) {
-        // TODO Auto-generated method stub
-        //super.exitPrograma(ctx);
-        //system.out.println("TERMINO EL PROGRAMAAA???!!!");
-        //this.tablaSimbolos.toPrint();
         this.tablaSimbolos.saveTablaSimbolos();
     }
 
@@ -198,7 +190,7 @@ public class Escucha extends ExpRegBaseListener{
         
         if(ctx.ID_NOMBRE_VAR_FUNC()!=null){
            if( ctx.ID_NOMBRE_VAR_FUNC()!=null && this.tablaSimbolos.buscarId(ctx.ID_NOMBRE_VAR_FUNC().getText())==null){
-                System.out.println("No se encuentra declarada la variable: "+ctx.ID_NOMBRE_VAR_FUNC().getText());
+                System.out.println("Warning: No se encuentra declarada la variable: "+ctx.ID_NOMBRE_VAR_FUNC().getText());
             } else{//quiere decir que la encontre a la fariable
                 //tenes que ver si al lado tenes una lista de numeros,
                 //tenés que ver si al lado tenes una lista de variables
@@ -287,7 +279,7 @@ public class Escucha extends ExpRegBaseListener{
             String nombreVariable=ctx.ID_NOMBRE_VAR_FUNC().getText();
             Identificador existId=this.tablaSimbolos.buscarId(nombreVariable);
             if(existId==null){
-                System.out.println("No se encuentra declarada la variable: "+nombreVariable);
+                System.out.println("Warning: No se encuentra declarada la variable: "+nombreVariable);
             } 
             //si la variable existe, voy y busco para setearla como que está siendo usada
             else if (existId!=null){
@@ -301,13 +293,13 @@ public class Escucha extends ExpRegBaseListener{
         String nombreFuncion=ctx.ID_NOMBRE_VAR_FUNC().getText();
         Funcion funcionEncontrada = (Funcion)this.tablaSimbolos.buscarId(nombreFuncion);
         if(funcionEncontrada==null){
-            System.out.println("No se encuentra declarada la funcion "+ctx.getText());
+            System.out.println("Warning: No se encuentra declarada la funcion "+ctx.getText());
         } else {
             funcionEncontrada.setUsada(true);
             if(this.bufferTempParametrosParaLlamada>funcionEncontrada.getArgumentos().size()){
-                System.out.println("Se está llamando a la funcion <-- "+funcionEncontrada.getID()+" --> con parámetros de más");
+                System.out.println("Warning: Se está llamando a la funcion <-- "+funcionEncontrada.getID()+" --> con parámetros de más");
             } else if(this.bufferTempParametrosParaLlamada<funcionEncontrada.getArgumentos().size()){
-                System.out.println("Se está llamando a la funcion <-- "+funcionEncontrada.getID()+" --> con parámetros de menos");
+                System.out.println("Warning: Se está llamando a la funcion <-- "+funcionEncontrada.getID()+" --> con parámetros de menos");
             }
         }
         this.bufferTempParametrosParaLlamada=0;
