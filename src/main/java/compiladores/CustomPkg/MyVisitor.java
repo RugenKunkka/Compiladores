@@ -663,8 +663,9 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
         //c_else if
         //quiere decir que existe algun else if a partir de ahora 
         int elseIfContextCounter=0;
-        C_elseifContext elseIfContext=ctx.c_elseif(elseIfContextCounter);
-        while(elseIfContext!=null){
+        int cantidadDeElseIf=ctx.C_ELSEIF().size();
+        //C_elseifContext elseIfContext=ctx.c_elseif(elseIfContextCounter);
+        for(int i=0; i<cantidadDeElseIf;i++){
             //bloqueIfToReturn+=("entramos al elseif!!!")+"\n";
             bloqueIfToReturn+=(visit(ctx.comparacion(comparadoresCounter)))+"\n";
             comparadoresCounter++;
@@ -680,12 +681,12 @@ public class MyVisitor extends ExpRegBaseVisitor<String> {
             bloqueIfToReturn+=("jmp e"+"<--ReplaceIfLabel")+"\n";
             bloqueIfToReturn+=("lbl e"+this.labelEIndex)+"\n";
             this.labelEIndex++;
-            elseIfContextCounter++;
-            elseIfContext=ctx.c_elseif(elseIfContextCounter);
+            //elseIfContextCounter++;
+            //elseIfContext=ctx.c_elseif(elseIfContextCounter);
         }
         //bloqueIfToReturn+=("Termina el elseif")+"\n";
 
-        if(ctx.c_else()!=null){
+        if(ctx.C_ELSE()!=null){
             if(ctx.bloque_instrucciones(bloqueInstruccionesCounter)!=null){
                 bloqueIfToReturn+=visit(ctx.bloque_instrucciones(bloqueInstruccionesCounter));
                 bloqueInstruccionesCounter++;

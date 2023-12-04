@@ -14,9 +14,12 @@ fragment LETRA : [a-zA-Z] ;
 
 fragment DIGITO : [0-9] ;
 
+C_IF:'if';
+C_ELSE:'else';
 C_WHILE:'while';
 C_FOR:'for';
 C_RETURN:'return';
+C_ELSEIF:'else if';
 
 PA : '(';
 PC : ')';
@@ -124,9 +127,9 @@ bloque_for: C_FOR PA instruccion comparacion_sin_parentesis FIN_DE_SENTENCIA act
 actualizacion_del_for: ID_NOMBRE_VAR_FUNC MAS MAS
                      ;
 
-c_if:'if';
-c_elseif:'else if';
-c_else:'else';
+
+
+
 
 
 
@@ -210,7 +213,7 @@ bloque_instrucciones: LLAVE_APERTURA instrucciones LLAVE_CIERRE ;
 
 instrucciones_del_for: instruccion comparacion ID_NOMBRE_VAR_FUNC asignacion_ld ;
 //antes bloque_instrucciones estaba instrucciones. consultar con el profe
-bloque_if: c_if comparacion (bloque_instrucciones|instruccion) (c_elseif comparacion (bloque_instrucciones|instruccion) )* (c_else (bloque_instrucciones|instruccion))?;
+bloque_if: C_IF comparacion (bloque_instrucciones|instruccion) (C_ELSEIF comparacion (bloque_instrucciones|instruccion) )* (C_ELSE (bloque_instrucciones|instruccion))?;
 
 COMENTARIO : '//' ~[\r\n]* -> skip;
 
@@ -223,6 +226,7 @@ instruccion:
            //realmente no hace falta este bloque funcion  pero ya veremos..
            | bloque_funcion //ver esta REGLA!!
            | retorno_funcion FIN_DE_SENTENCIA
+           | bloque_if
            | llamada_funcion FIN_DE_SENTENCIA
            | COMENTARIO
            //fin de funciones
@@ -235,7 +239,7 @@ instruccion:
            //| c_if comparacion
            //| c_elseif comparacion
            //| c_else
-           | bloque_if
+           
            //fin ifs else ifs else inicio
            | bloque_for
            //| c_for PA instrucciones_del_for PC
