@@ -84,10 +84,29 @@ class TablaSimbolos  {
     public void saveTablaSimbolos() {
         String filePath = "TablaSimbolos.txt"; // Ruta relativa dentro del proyecto
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))) {
+            String content="";
+            int cantidadDeIguales=0;
             for (NodoContext nodoContext : this.historialContext) {
-                String content = nodoContext.toString();
+                content = nodoContext.toString();
+                //if(content.contains("=")){
+                    int contadorDeIguales=0;
+                    for (int i = 0; i < content.length(); i++) {
+                        if (content.charAt(i) == '=') {
+                            contadorDeIguales++;
+                        }
+                    }
+                    if(contadorDeIguales!=cantidadDeIguales){
+                        cantidadDeIguales=contadorDeIguales;
+                        String tempContent=content;
+                        content="-------------------------------------------------------------------------------------------------------\n";
+                        content+=tempContent;
+                    }
+                //}
+                //content+="\n";
+                //content+="=======================";
                 writer.println(content);
             }
+            
             System.out.println("Contenido guardado en " + filePath);
         } catch (IOException e) {
             System.err.println("Error al guardar el contenido en el archivo: " + e.getMessage());
